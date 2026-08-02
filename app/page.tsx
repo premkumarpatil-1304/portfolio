@@ -8,7 +8,6 @@ import AmbientBackground from "@/components/AmbientBackground";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import TechStack from "@/components/TechStack";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import TechRoadmap from "@/components/TechRoadmap";
@@ -44,7 +43,7 @@ export default function HomePage() {
           <main className="flex-1">
             <Hero />
             <About />
-            <TechStack />
+           
             <Projects />
             <Experience />
             <TechRoadmap />

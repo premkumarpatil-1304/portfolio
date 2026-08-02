@@ -5,8 +5,12 @@ import { useState, useRef, useMemo } from "react";
 import { Award, Trophy, CheckCircle, Sparkles, Star, X, ExternalLink, Clock, Users, Code2 } from "lucide-react";
 
 const soria = "'Soria', 'Century Gothic', sans-serif";
-
-const certifications = [
+type Certification = {
+  title: string;
+  issuer: string;
+  category: string;
+};
+const certifications: Certification[] = [
   { title: "MongoDB Certified Developer", issuer: "MongoDB", category: "Database" },
   { title: "HackerRank SQL Certification", issuer: "HackerRank", category: "Database & SQL" },
   { title: "Infosys C Programming", issuer: "Infosys Springboard", category: "Programming" },
@@ -379,7 +383,7 @@ function HackathonModal({
 function CertificationsFiltered({
   certifications,
 }: {
-  certifications: typeof certifications;
+  certifications: Certification[];
 }) {
   const [activeFilter, setActiveFilter] = useState<string>("All");
 
