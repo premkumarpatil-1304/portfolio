@@ -15,7 +15,7 @@ import Achievements from "@/components/Achievements";
 import SkillsOverview from "@/components/SkillsOverview";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import ForestCursor from "@/components/ForestCursor";
+import TechStack from "@/components/TechStack";
 import StickyCursor from "@/components/StickyCursor";
 
 export default function HomePage() {
@@ -43,7 +43,7 @@ export default function HomePage() {
           <main className="flex-1">
             <Hero />
             <About />
-           
+            <TechStack />
             <Projects />
             <Experience />
             <TechRoadmap />

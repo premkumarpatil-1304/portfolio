@@ -22,7 +22,7 @@ export default function SkillsOverview() {
 
   return (
     <section
-      id="skills"
+      id="skillsoverview"
       className="relative overflow-hidden bg-[#1E3A2F] px-6 py-24 md:px-10 lg:px-16"
     >
       {/* No gradients — flat background like other components */}

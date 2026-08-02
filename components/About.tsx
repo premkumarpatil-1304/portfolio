@@ -37,7 +37,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-20  md:px-10 lg:px-16"
+      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-25  md:px-10 lg:px-16"
     >
       {/* Subtle ambient glow */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_left,rgba(96,122,85,0.1),transparent_60%)]" />

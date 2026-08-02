@@ -8,32 +8,77 @@ type LoaderProps = {
 };
 
 /* ═══════════════════════════════════════════════════════════════════════ */
-/*  SEED SAPLING LOADER — Premium nature-inspired loading animation      */
-/*  5 scenes: Seed fall → Roots → Sprout → Text → Hexagon transition    */
-/*  60/30/10 palette: Forest Green / Moss Green / Champagne Gold        */
+/*  CIRCUIT BOOT LOADER — Tech-inspired loading animation                 */
+/*  5 scenes: Terminal boot → Circuit draw → Progress → Text → Expand     */
+/*  Palette: Forest Green / Moss Green / Champagne Gold                  */
 /* ═══════════════════════════════════════════════════════════════════════ */
+
+// Fixed (non-random) particle configs — identical on server & client,
+// which avoids the hydration mismatch that Math.random() caused.
+const DATA_PACKETS = [
+  { x: 12, y: 20, size: 3, delay: 0.1, duration: 2.4 },
+  { x: 78, y: 15, size: 2, delay: 0.4, duration: 2.1 },
+  { x: 34, y: 68, size: 3, delay: 0.8, duration: 2.6 },
+  { x: 88, y: 55, size: 2, delay: 0.2, duration: 2.3 },
+  { x: 55, y: 82, size: 2, delay: 0.6, duration: 2.0 },
+  { x: 18, y: 45, size: 3, delay: 1.0, duration: 2.5 },
+  { x: 92, y: 30, size: 2, delay: 0.3, duration: 2.2 },
+  { x: 45, y: 10, size: 3, delay: 0.7, duration: 2.7 },
+  { x: 65, y: 40, size: 2, delay: 0.5, duration: 2.1 },
+  { x: 25, y: 90, size: 3, delay: 0.9, duration: 2.4 },
+  { x: 70, y: 72, size: 2, delay: 0.15, duration: 2.3 },
+  { x: 8, y: 60, size: 2, delay: 1.1, duration: 2.6 },
+];
+
+const GOLD = "#D8C3A5";
+const MOSS = "#617A55";
+const CREAM = "#F5F1EA";
+const FOREST = "#1E3A2F";
 
 export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
   const [scene, setScene] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  // Detect reduced-motion preference client-side only, after mount,
+  // so server and client render identically on first pass.
+  useEffect(() => {
+    setReducedMotion(
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+  }, []);
 
   useEffect(() => {
     if (!isLoading) return;
 
     const timers = [
-      setTimeout(() => setScene(1), 500),   // Scene 1: Seed falls
-      setTimeout(() => setScene(2), 1200),   // Scene 2: Roots grow
-      setTimeout(() => setScene(3), 1800),   // Scene 3: Sprout emerges
-      setTimeout(() => setScene(4), 2300),   // Scene 4: Text fades in
-      setTimeout(() => setScene(5), 2500),   // Scene 5: Hexagon transition
+      setTimeout(() => setScene(1), 400),  // Scene 1: terminal boot text
+      setTimeout(() => setScene(2), 1000), // Scene 2: circuit draws
+      setTimeout(() => setScene(3), 1600), // Scene 3: progress bar counts
+      setTimeout(() => setScene(4), 2300), // Scene 4: name/text fade in
+      setTimeout(() => setScene(5), 2600), // Scene 5: hexagon expand out
     ];
 
     return () => timers.forEach(clearTimeout);
   }, [isLoading]);
 
-  const prefersReducedMotion =
-    typeof window !== "undefined"
-      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      : false;
+  // Deterministic progress counter (0 -> 100), no randomness.
+  useEffect(() => {
+    if (scene < 3) return;
+    let raf: number;
+    let start: number | null = null;
+    const durationMs = 650;
+
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const elapsed = ts - start;
+      const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+      setProgress(pct);
+      if (pct < 100) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [scene]);
 
   return (
     <AnimatePresence>
@@ -43,371 +88,204 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
-          style={{ background: "#1E3A2F" }}
+          style={{ background: FOREST }}
         >
-          {/* Ambient background — fog particles */}
-          {!prefersReducedMotion && (
-            <>
-              {/* Slow fog layers */}
+          {/* Ambient glow blobs */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.15 }}
+            transition={{ duration: 1.5, delay: 0.2 }}
+            className="absolute inset-0"
+          >
+            <div
+              className="absolute w-[600px] h-[600px] rounded-full blur-[130px]"
+              style={{ top: "-15%", right: "-10%", background: MOSS, opacity: 0.15 }}
+            />
+            <div
+              className="absolute w-[500px] h-[500px] rounded-full blur-[110px]"
+              style={{ bottom: "-15%", left: "-10%", background: MOSS, opacity: 0.1 }}
+            />
+          </motion.div>
+
+          {/* Subtle grid backdrop */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: `
+                linear-gradient(${GOLD} 1px, transparent 1px),
+                linear-gradient(90deg, ${GOLD} 1px, transparent 1px)
+              `,
+              backgroundSize: "40px 40px",
+            }}
+          />
+
+          {/* Floating data packets — fixed positions, no hydration mismatch */}
+          {!reducedMotion &&
+            DATA_PACKETS.map((p, i) => (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.15 }}
-                transition={{ duration: 2, delay: 0.3 }}
-                className="absolute inset-0"
-              >
-                <div
-                  className="absolute w-[600px] h-[600px] rounded-full blur-[120px]"
-                  style={{
-                    top: "-10%",
-                    right: "-10%",
-                    background: "#617A55",
-                    opacity: 0.15,
-                  }}
-                />
-                <div
-                  className="absolute w-[500px] h-[500px] rounded-full blur-[100px]"
-                  style={{
-                    bottom: "-15%",
-                    left: "-10%",
-                    background: "#617A55",
-                    opacity: 0.1,
-                  }}
-                />
-              </motion.div>
-
-              {/* Floating dust particles */}
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{
-                    x: `${Math.random() * 100}%`,
-                    y: `${Math.random() * 100}%`,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    opacity: [0, 0.3, 0.1, 0.4, 0],
-                    y: [null, -30 - Math.random() * 40],
-                    x: [null, (Math.random() - 0.5) * 60],
-                  }}
-                  transition={{
-                    duration: 2 + Math.random() * 1.5,
-                    delay: Math.random() * 1,
-                    repeat: Infinity,
-                    repeatDelay: Math.random() * 2,
-                  }}
-                  className="absolute rounded-full pointer-events-none"
-                  style={{
-                    width: 2 + Math.random() * 2,
-                    height: 2 + Math.random() * 2,
-                    background: "#D8C3A5",
-                    filter: `blur(${Math.random()}px)`,
-                  }}
-                />
-              ))}
-            </>
-          )}
-
-          {/* Center stage — SVG animations */}
-          <div className="relative flex flex-col items-center justify-center">
-
-            {/* SEED (Scene 0-1) */}
-            <motion.div
-              initial={{ y: -200, opacity: 0, rotate: -15 }}
-              animate={
-                scene >= 1
-                  ? {
-                      y: 0,
-                      opacity: 1,
-                      rotate: 0,
-                      transition: {
-                        duration: 0.5,
-                        type: "spring",
-                        stiffness: 60,
-                        damping: 12,
-                      },
-                    }
-                  : {}
-              }
-              className="relative"
-              style={{ display: scene >= 1 ? "block" : "none" }}
-            >
-              {/* Seed SVG */}
-              <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
-                <path
-                  d="M16 0C10 0 4 8 4 20C4 32 10 40 16 42C22 40 28 32 28 20C28 8 22 0 16 0Z"
-                  fill="#D8C3A5"
-                  opacity="0.9"
-                />
-                <path
-                  d="M16 8C16 8 16 34 16 34"
-                  stroke="#617A55"
-                  strokeWidth="1"
-                  opacity="0.4"
-                />
-                <path
-                  d="M16 14C12 12 8 10 6 12"
-                  stroke="#617A55"
-                  strokeWidth="0.8"
-                  opacity="0.3"
-                />
-                <path
-                  d="M16 14C20 12 24 10 26 12"
-                  stroke="#617A55"
-                  strokeWidth="0.8"
-                  opacity="0.3"
-                />
-                {/* Golden crack glow */}
-                <motion.path
-                  d="M16 6C16 6 16 18 16 18"
-                  stroke="#D8C3A5"
-                  strokeWidth="1.5"
-                  initial={{ opacity: 0, pathLength: 0 }}
-                  animate={
-                    scene >= 2
-                      ? { opacity: [0, 0.8, 0.6], pathLength: [0, 1], transition: { duration: 0.6 } }
-                      : {}
-                  }
-                />
-              </svg>
-
-              {/* Seed glow */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={
-                  scene >= 1
-                    ? { opacity: [0, 0.3, 0.15], scale: [0, 1.5, 1.2] }
-                    : {}
-                }
-                transition={{ duration: 0.5 }}
-                className="absolute inset-0 rounded-full"
+                key={i}
+                initial={{ opacity: 0, x: `${p.x}%`, y: `${p.y}%` }}
+                animate={{
+                  opacity: [0, 0.5, 0.2, 0.5, 0],
+                  y: [`${p.y}%`, `${p.y - 6}%`],
+                }}
+                transition={{
+                  duration: p.duration,
+                  delay: p.delay,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                }}
+                className="absolute rounded-sm pointer-events-none"
                 style={{
-                  background: "radial-gradient(circle, rgba(216,195,165,0.3) 0%, transparent 70%)",
-                  width: "80px",
-                  height: "80px",
-                  left: "-24px",
-                  top: "-19px",
+                  width: p.size,
+                  height: p.size,
+                  background: GOLD,
+                  boxShadow: `0 0 ${p.size * 2}px ${GOLD}`,
                 }}
               />
-            </motion.div>
+            ))}
 
-            {/* ROOTS (Scene 2) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={scene >= 2 ? { opacity: 1 } : {}}
-              transition={{ duration: 0.6 }}
-              style={{
-                position: "absolute",
-                top: "42px",
-                display: scene >= 2 ? "block" : "none",
-              }}
-            >
-              <svg width="80" height="60" viewBox="0 0 80 60" fill="none">
-                {/* Main root */}
-                <motion.path
-                  d="M40 0C40 15 38 30 35 45"
-                  stroke="#617A55"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 2 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                />
-                {/* Branch root left */}
-                <motion.path
-                  d="M37 25C30 30 22 32 15 38"
-                  stroke="#617A55"
-                  strokeWidth="1.2"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 2 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                />
-                {/* Branch root right */}
-                <motion.path
-                  d="M36 30C44 35 52 38 60 42"
-                  stroke="#617A55"
-                  strokeWidth="1.2"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 2 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                />
-                {/* Tiny root hairs */}
-                <motion.path
-                  d="M20 35C18 40 16 44 14 48"
-                  stroke="#617A55"
-                  strokeWidth="0.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 2 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.4, delay: 0.4 }}
-                />
-                <motion.path
-                  d="M55 40C58 44 60 47 62 50"
-                  stroke="#617A55"
-                  strokeWidth="0.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 2 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.4, delay: 0.5 }}
-                />
-                {/* Golden glow at root tips */}
-                {scene >= 2 && (
-                  <>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 0.5, 0.2] }}
-                      transition={{ duration: 0.8, delay: 0.6 }}
-                      className="absolute rounded-full"
-                      style={{
-                        width: 6,
-                        height: 6,
-                        background: "#D8C3A5",
-                        bottom: -2,
-                        left: 32,
-                        filter: "blur(3px)",
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 0.4, 0.1] }}
-                      transition={{ duration: 0.8, delay: 0.8 }}
-                      className="absolute rounded-full"
-                      style={{
-                        width: 5,
-                        height: 5,
-                        background: "#D8C3A5",
-                        bottom: 18,
-                        left: 10,
-                        filter: "blur(2px)",
-                      }}
-                    />
-                  </>
-                )}
-              </svg>
-            </motion.div>
+          {/* Center stage */}
+          <div className="relative flex flex-col items-center justify-center gap-6 z-10">
 
-            {/* SPROUT (Scene 3) */}
+            {/* CIRCUIT NODE NETWORK (Scene 1-2) */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={scene >= 3 ? { opacity: 1 } : {}}
-              style={{
-                position: "absolute",
-                bottom: scene >= 3 ? "auto" : undefined,
-                top: scene >= 3 ? undefined : "-60px",
-                display: scene >= 3 ? "block" : "none",
-              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={scene >= 1 ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.4 }}
+              className="relative"
             >
-              <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
-                {/* Stem */}
-                <motion.path
-                  d="M30 80C30 60 28 40 30 20"
-                  stroke="#617A55"
-                  strokeWidth="2.5"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 3 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                />
-                {/* Left leaf */}
-                <motion.path
-                  d="M30 35C20 28 12 22 8 28C12 32 20 34 30 38"
-                  fill="#617A55"
-                  opacity="0.7"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 3 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                />
-                {/* Right leaf */}
-                <motion.path
-                  d="M30 28C40 22 48 18 52 24C48 28 40 30 30 32"
-                  fill="#617A55"
-                  opacity="0.7"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 3 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.5, delay: 0.45 }}
-                />
-                {/* Leaf vein left */}
-                <motion.path
-                  d="M30 35C24 31 18 27 12 28"
-                  stroke="#D8C3A5"
-                  strokeWidth="0.5"
-                  fill="none"
-                  opacity="0.4"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 3 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                />
-                {/* Leaf vein right */}
-                <motion.path
-                  d="M30 30C38 26 44 23 50 24"
-                  stroke="#D8C3A5"
-                  strokeWidth="0.5"
-                  fill="none"
-                  opacity="0.4"
-                  initial={{ pathLength: 0 }}
-                  animate={scene >= 3 ? { pathLength: 1 } : {}}
-                  transition={{ duration: 0.3, delay: 0.75 }}
-                />
-                {/* Top bud */}
+              <svg width="140" height="140" viewBox="0 0 140 140" fill="none">
+                {/* Connection lines */}
+                {[
+                  "M70,70 L30,30",
+                  "M70,70 L110,30",
+                  "M70,70 L30,110",
+                  "M70,70 L110,110",
+                  "M70,70 L70,20",
+                  "M70,70 L70,120",
+                ].map((d, i) => (
+                  <motion.path
+                    key={i}
+                    d={d}
+                    stroke={GOLD}
+                    strokeWidth="1.2"
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={
+                      scene >= 2
+                        ? { pathLength: 1, opacity: 0.6 }
+                        : {}
+                    }
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                  />
+                ))}
+
+                {/* Outer nodes */}
+                {[
+                  { cx: 30, cy: 30 },
+                  { cx: 110, cy: 30 },
+                  { cx: 30, cy: 110 },
+                  { cx: 110, cy: 110 },
+                  { cx: 70, cy: 20 },
+                  { cx: 70, cy: 120 },
+                ].map((n, i) => (
+                  <motion.circle
+                    key={i}
+                    cx={n.cx}
+                    cy={n.cy}
+                    r="4"
+                    fill={MOSS}
+                    stroke={GOLD}
+                    strokeWidth="1"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={scene >= 2 ? { scale: 1, opacity: 1 } : {}}
+                    transition={{ duration: 0.3, delay: 0.3 + i * 0.06 }}
+                  />
+                ))}
+
+                {/* Center core node */}
                 <motion.circle
-                  cx="30"
-                  cy="18"
-                  r="3"
-                  fill="#D8C3A5"
-                  initial={{ scale: 0 }}
-                  animate={scene >= 3 ? { scale: 1 } : {}}
-                  transition={{ duration: 0.3, delay: 0.8 }}
+                  cx="70"
+                  cy="70"
+                  r="7"
+                  fill={GOLD}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={scene >= 1 ? { scale: 1, opacity: 1 } : {}}
+                  transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
                 />
-                {/* Sway animation on stem */}
-                {scene >= 3 && (
-                  <motion.g
-                    animate={{ rotate: [-1, 1, -0.5, 0.5, -1] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    style={{ transformOrigin: "30px 80px" }}
-                  >
-                    {/* Invisible rect for sway reference */}
-                  </motion.g>
+                {/* Pulse ring around core */}
+                {scene >= 2 && (
+                  <motion.circle
+                    cx="70"
+                    cy="70"
+                    r="7"
+                    stroke={GOLD}
+                    strokeWidth="1.5"
+                    fill="none"
+                    initial={{ scale: 1, opacity: 0.6 }}
+                    animate={{ scale: [1, 2.4], opacity: [0.6, 0] }}
+                    transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+                  />
                 )}
               </svg>
-
-              {/* Pollen particles floating up */}
-              {!prefersReducedMotion && scene >= 3 && (
-                <>
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={`pollen-${i}`}
-                      initial={{ opacity: 0, y: 0 }}
-                      animate={{
-                        opacity: [0, 0.5, 0],
-                        y: [-10 - i * 15, -40 - i * 20],
-                        x: [(Math.random() - 0.5) * 20],
-                      }}
-                      transition={{
-                        duration: 1.2 + Math.random() * 0.5,
-                        delay: i * 0.15,
-                      }}
-                      className="absolute rounded-full"
-                      style={{
-                        width: 2,
-                        height: 2,
-                        background: "#D8C3A5",
-                        left: `${25 + (Math.random() - 0.5) * 20}px`,
-                        top: `${20 + i * 10}px`,
-                      }}
-                    />
-                  ))}
-                </>
-              )}
             </motion.div>
 
-            {/* TEXT (Scene 4) */}
+            {/* TERMINAL BOOT TEXT (Scene 1) */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={scene >= 1 ? { opacity: 1 } : {}}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-2"
+              style={{ display: scene >= 1 && scene < 3 ? "flex" : "none" }}
+            >
+              <span
+                className="text-xs tracking-widest"
+                style={{ color: MOSS, fontFamily: "monospace" }}
+              >
+                {"> "}
+                {scene >= 2 ? "compiling modules..." : "booting system..."}
+              </span>
+              <motion.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                style={{ color: GOLD, fontFamily: "monospace" }}
+              >
+                _
+              </motion.span>
+            </motion.div>
+
+            {/* PROGRESS BAR (Scene 3) */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={scene >= 3 ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center gap-2 w-[220px]"
+              style={{ display: scene >= 3 ? "flex" : "none" }}
+            >
+              <div
+                className="w-full h-[3px] rounded-full overflow-hidden"
+                style={{ background: "rgba(97,122,85,0.2)" }}
+              >
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    background: `linear-gradient(90deg, ${MOSS}, ${GOLD})`,
+                    boxShadow: `0 0 8px ${GOLD}`,
+                  }}
+                />
+              </div>
+              <span
+                className="text-[10px] tracking-[0.2em]"
+                style={{ color: GOLD, fontFamily: "monospace" }}
+              >
+                {progress}%
+              </span>
+            </motion.div>
+
+            {/* NAME / ROLE (Scene 4) */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={
@@ -415,46 +293,44 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                   ? { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
                   : {}
               }
-              className="relative z-10 text-center mt-6"
+              className="text-center mt-2"
               style={{ display: scene >= 4 ? "block" : "none" }}
             >
               <h1
                 className="text-2xl sm:text-3xl font-bold tracking-[0.2em] uppercase"
-                style={{ color: "#F5F1EA", fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
+                style={{ color: CREAM, fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
               >
                 Premkumar Patil
               </h1>
               <p
                 className="mt-2 text-xs tracking-[0.35em] uppercase"
-                style={{ color: "#D8C3A5", fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
+                style={{ color: GOLD, fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
               >
                 Full Stack Developer
               </p>
             </motion.div>
 
-            {/* HEXAGON TRANSITION (Scene 5) */}
+            {/* HEXAGON EXPAND TRANSITION (Scene 5) */}
             {scene >= 5 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{
                   opacity: [0, 0.6, 1],
-                  scale: [0, 1.5, 2],
+                  scale: [0, 1.6, 2.2],
                   transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
                 }}
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
               >
-                {/* Central hexagon */}
                 <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
                   <motion.polygon
                     points="60,5 105,30 105,90 60,115 15,90 15,30"
-                    stroke="#D8C3A5"
+                    stroke={GOLD}
                     strokeWidth="1.5"
                     fill="rgba(216,195,165,0.08)"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 1 }}
                     transition={{ duration: 0.6 }}
                   />
-                  {/* Surrounding hexagons */}
                   {[
                     { cx: 60, cy: -35, delay: 0.1 },
                     { cx: 105, cy: 10, delay: 0.2 },
@@ -466,7 +342,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                     <motion.polygon
                       key={i}
                       points={`${hex.cx},${hex.cy - 25} ${hex.cx + 22},${hex.cy - 12.5} ${hex.cx + 22},${hex.cy + 12.5} ${hex.cx},${hex.cy + 25} ${hex.cx - 22},${hex.cy + 12.5} ${hex.cx - 22},${hex.cy - 12.5}`}
-                      stroke="#D8C3A5"
+                      stroke={GOLD}
                       strokeWidth="0.8"
                       fill="rgba(216,195,165,0.04)"
                       initial={{ opacity: 0, scale: 0 }}
@@ -478,19 +354,6 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
               </motion.div>
             )}
           </div>
-
-          {/* Golden sunlight from above */}
-          {scene >= 3 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.06 }}
-              transition={{ duration: 1 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[400px]"
-              style={{
-                background: "linear-gradient(to bottom, rgba(216,195,165,0.15) 0%, transparent 100%)",
-              }}
-            />
-          )}
         </motion.div>
       )}
     </AnimatePresence>

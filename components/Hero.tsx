@@ -207,7 +207,7 @@ export default function Hero() {
                   {/* Content */}
                   <div className="relative z-10 flex flex-col items-center px-6">
                     {/* Avatar frame */}
-                    <div className="relative mb-6 h-70 w-60 rounded-full border border-[#D8C3A5]/40 p-1 shadow-xl shadow-black/20 overflow-hidden">
+                    <div className="mt-16 relative mb-6 h-60 w-50 rounded-full border border-[#D8C3A5]/40 p-1 shadow-xl shadow-black/20 overflow-hidden">
                       <div
                         className="h-full w-full rounded-full bg-cover bg-center"
                         style={{

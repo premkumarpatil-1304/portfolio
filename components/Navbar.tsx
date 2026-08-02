@@ -8,16 +8,17 @@ import { motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeContext";
 
 // In your navbar:
-<ThemeToggle />
+
 
 const navLinks = [
   { name: "About", href: "#about" },
    { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
+ 
   { name: "Experience", href: "#experience" },
   { name: "Roadmap", href: "#roadmap" },
   { name: "Achievements", href: "#achievements" },
- 
+  { name: "SkillsOverview", href: "#skillsoverview" },
   { name: "Contact", href: "#contact" },
 ];
 
@@ -35,6 +36,7 @@ export default function Navbar() {
         setScrolled(false);
       }
     };
+
 
     window.addEventListener("scroll", handleScroll);
 
@@ -63,6 +65,15 @@ export default function Navbar() {
       observer.disconnect();
     };
   }, []);
+  // Auto-close mobile menu on scroll
+useEffect(() => {
+  if (!isOpen) return;
+
+  const closeOnScroll = () => setIsOpen(false);
+
+  window.addEventListener("scroll", closeOnScroll);
+  return () => window.removeEventListener("scroll", closeOnScroll);
+}, [isOpen]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 transition-all duration-300"
