@@ -1,507 +1,1618 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { useRef, useMemo, useCallback } from "react";
+import {
+  motion,
+  useInView,
+  AnimatePresence,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
 
-const soria = "'Soria', 'Century Gothic', sans-serif";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  memo,
+} from "react";
 
-const skills = [
-  "Java", "Spring Boot", "React", "JavaScript", "TypeScript",
-  "HTML", "CSS", "Tailwind CSS", "Bootstrap", "FastAPI",
-  "Python", "MySQL", "MongoDB", "Git", "GitHub",
-  "Docker", "Linux", "AWS", "REST APIs", "JWT",
-  "Socket.IO", "Firebase", "Figma", "VS Code",
+import type { IconType } from "react-icons";
+
+import {
+  SiReact,
+  SiJavascript,
+  SiTypescript,
+  SiPython,
+  SiHtml5,
+  SiTailwindcss,
+  SiBootstrap,
+  SiSpringboot,
+  SiFastapi,
+  SiSocketdotio,
+  SiMongodb,
+  SiMysql,
+  SiDocker,
+  SiLinux,
+  SiGit,
+  SiGithub,
+  SiFigma,
+  SiJsonwebtokens,
+} from "react-icons/si";
+
+import {
+  FaJava,
+  FaAws,
+  FaCss3Alt,
+} from "react-icons/fa6";
+
+import {
+  VscVscode,
+} from "react-icons/vsc";
+
+
+import { SiNodedotjs } from "react-icons/si";
+import {
+  ExternalLink,
+  ChevronRight,
+  Star,
+  X,
+  Code2,
+} from "lucide-react";
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  BRAND COLOR MAP — CHANGED TO FOREST GREEN / MOSS GREEN / CHAMPAGNE GOLD */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+const BRANDS: Record<string, BrandColors> = {
+  React: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  JavaScript: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  TypeScript: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  Java: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  Python: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  HTML5: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  CSS3: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  "Tailwind CSS": {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  Bootstrap: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  "Spring Boot": {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  FastAPI: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  "REST API": {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  JWT: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  "Socket.IO": {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  MongoDB: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  MySQL: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  Docker: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  Linux: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  AWS: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  Git: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  GitHub: {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+  Figma: {
+    primary: "#D8C3A5",
+    glow: "rgba(216,195,165,0.3)",
+    border: "rgba(216,195,165,0.45)",
+    bg: "rgba(216,195,165,0.06)",
+    text: "#D8C3A5",
+  },
+  "VS Code": {
+    primary: "#B8C9B2",
+    glow: "rgba(184,201,178,0.3)",
+    border: "rgba(184,201,178,0.45)",
+    bg: "rgba(184,201,178,0.06)",
+    text: "#B8C9B2",
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  ICON MAP                                                             */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+const TECH_ICONS: Record<string, IconType> = {
+  Java: FaJava,
+  Python: SiPython,
+  JavaScript: SiJavascript,
+  TypeScript: SiTypescript,
+  React: SiReact,
+  HTML: SiHtml5,
+  CSS: FaCss3Alt,
+  "Tailwind CSS": SiTailwindcss,
+  Bootstrap: SiBootstrap,
+  "Spring Boot": SiSpringboot,
+  FastAPI: SiFastapi,
+  "Socket.IO": SiSocketdotio,
+  MongoDB: SiMongodb,
+  MySQL: SiMysql,
+  Docker: SiDocker,
+  Linux: SiLinux,
+  AWS: FaAws,
+  Git: SiGit,
+  GitHub: SiGithub,
+  Figma: SiFigma,
+  "VS Code": VscVscode,
+  JWT: SiJsonwebtokens,
+};
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  SKILL DATA                                                           */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+const SKILLS: Skill[] = [
+  {
+    name: "Java",
+    category: "Programming",
+    categoryId: "programming",
+    level: "Advanced",
+    projects: 12,
+    description:
+      "Core OOP language with enterprise-grade ecosystem including Spring, Hibernate, and JVM optimization.",
+    achievements: [
+      "Built scalable microservices architecture",
+      "Implemented event-driven systems with Kafka",
+      "Optimized JVM performance by 40%",
+    ],
+    github: "#",
+  },
+  {
+    name: "Python",
+    category: "Programming",
+    categoryId: "programming",
+    level: "Advanced",
+    projects: 8,
+    description:
+      "Versatile language for APIs, data processing, automation, and machine learning pipelines.",
+    achievements: [
+      "Developed AI-powered data pipelines",
+      "Automated CI/CD workflows",
+      "Built real-time analytics dashboard",
+    ],
+    github: "#",
+  },
+  {
+    name: "JavaScript",
+    category: "Programming",
+    categoryId: "programming",
+    level: "Advanced",
+    projects: 15,
+    description:
+      "Core web language with ES6+ features, async patterns, and modern tooling ecosystem.",
+    achievements: [
+      "Built 15+ full-stack applications",
+      "Implemented real-time collaboration features",
+      "Created custom npm packages",
+    ],
+    github: "#",
+  },
+  {
+    name: "TypeScript",
+    category: "Programming",
+    categoryId: "programming",
+    level: "Intermediate",
+    projects: 5,
+    description:
+      "Type-safe JavaScript enabling scalable, maintainable applications with compile-time checks.",
+    achievements: [
+      "Migrated legacy JS to TypeScript",
+      "Reduced runtime errors by 70%",
+      "Built type-safe API clients",
+    ],
+    github: "#",
+  },
+  {
+    name: "React",
+    category: "Frontend",
+    categoryId: "frontend",
+    level: "Advanced",
+    projects: 6,
+    description:
+      "Component-based UI library with hooks, context, and modern state management patterns.",
+    achievements: [
+      "Built complex dashboard interfaces",
+      "Implemented virtual scrolling",
+      "Optimized bundle size by 60%",
+    ],
+    github: "#",
+  },
+  {
+    name: "HTML5",
+    category: "Frontend",
+    categoryId: "frontend",
+    level: "Advanced",
+    projects: 15,
+    description:
+      "Semantic markup with accessibility best practices, ARIA attributes, and progressive enhancement.",
+    achievements: [
+      "Achieved WCAG AA compliance",
+      "Built responsive email templates",
+      "Created semantic component libraries",
+    ],
+  },
+  {
+    name: "CSS3",
+    category: "Frontend",
+    categoryId: "frontend",
+    level: "Advanced",
+    projects: 15,
+    description:
+      "Modern CSS with custom properties, grid, flexbox, animations, and container queries.",
+    achievements: [
+      "Built design system from scratch",
+      "Implemented complex animation systems",
+      "Created CSS-only interactive components",
+    ],
+  },
+  {
+    name: "Tailwind CSS",
+    category: "Frontend",
+    categoryId: "frontend",
+    level: "Advanced",
+    projects: 8,
+    description:
+      "Utility-first CSS framework enabling rapid UI development with consistent design tokens.",
+    achievements: [
+      "Built 8 production-ready UIs",
+      "Created custom Tailwind plugins",
+      "Reduced CSS bundle by 80%",
+    ],
+    github: "#",
+  },
+  {
+    name: "Bootstrap",
+    category: "Frontend",
+    categoryId: "frontend",
+    level: "Intermediate",
+    projects: 4,
+    description:
+      "Responsive component library with grid system, utilities, and customizable theming.",
+    achievements: [
+      "Built responsive admin dashboards",
+      "Customized Bootstrap themes",
+      "Implemented accessible form components",
+    ],
+  },
+  {
+    name: "Spring Boot",
+    category: "Backend",
+    categoryId: "backend",
+    level: "Intermediate",
+    projects: 3,
+    description:
+      "Enterprise Java framework for building production-ready REST APIs with auto-configuration.",
+    achievements: [
+      "Built microservices with Spring Cloud",
+      "Implemented JWT authentication flows",
+      "Integrated with message brokers",
+    ],
+    github: "#",
+  },
+  {
+    name: "FastAPI",
+    category: "Backend",
+    categoryId: "backend",
+    level: "Advanced",
+    projects: 4,
+    description:
+      "Async Python API framework with automatic OpenAPI docs, validation, and high performance.",
+    achievements: [
+      "Built high-throughput API services",
+      "Implemented WebSocket real-time features",
+      "Auto-generated API documentation",
+    ],
+    github: "#",
+  },
+  {
+    name: "REST API",
+    category: "Backend",
+    categoryId: "backend",
+    level: "Advanced",
+    projects: 8,
+    description:
+      "RESTful service design with proper HTTP semantics, pagination, filtering, and versioning.",
+    achievements: [
+      "Designed 8+ production APIs",
+      "Implemented rate limiting and caching",
+      "Built API gateways with load balancing",
+    ],
+  },
+  {
+    name: "JWT",
+    category: "Backend",
+    categoryId: "backend",
+    level: "Intermediate",
+    projects: 5,
+    description:
+      "Token-based authentication with refresh tokens, role-based access control, and secure storage.",
+    achievements: [
+      "Implemented OAuth 2.0 flows",
+      "Built RBAC permission systems",
+      "Secured APIs with token rotation",
+    ],
+  },
+  {
+    name: "Socket.IO",
+    category: "Backend",
+    categoryId: "backend",
+    level: "Intermediate",
+    projects: 2,
+    description:
+      "Real-time bidirectional event-based communication for live features and collaborative apps.",
+    achievements: [
+      "Built real-time chat application",
+      "Implemented live notification system",
+      "Created collaborative editing features",
+    ],
+    github: "#",
+  },
+  {
+    name: "MongoDB",
+    category: "Database",
+    categoryId: "database",
+    level: "Advanced",
+    projects: 6,
+    description:
+      "NoSQL document database with aggregation pipelines, indexing, and horizontal scaling.",
+    achievements: [
+      "Designed denormalized data models",
+      "Built full-text search indexes",
+      "Implemented change streams",
+    ],
+    github: "#",
+  },
+  {
+    name: "MySQL",
+    category: "Database",
+    categoryId: "database",
+    level: "Intermediate",
+    projects: 4,
+    description:
+      "Relational database with complex queries, indexing strategies, and transaction management.",
+    achievements: [
+      "Optimized slow queries by 5x",
+      "Designed normalized schemas",
+      "Implemented replication setups",
+    ],
+  },
+  {
+    name: "Docker",
+    category: "DevOps",
+    categoryId: "devops",
+    level: "Intermediate",
+    projects: 3,
+    description:
+      "Containerization for consistent development, testing, and production environments.",
+    achievements: [
+      "Containerized 3 production apps",
+      "Optimized Docker images for size",
+      "Built multi-stage build pipelines",
+    ],
+    github: "#",
+  },
+  {
+    name: "Linux",
+    category: "DevOps",
+    categoryId: "devops",
+    level: "Intermediate",
+    projects: 5,
+    description:
+      "Command-line proficiency with system administration, scripting, and server management.",
+    achievements: [
+      "Managed production Linux servers",
+      "Wrote automation bash scripts",
+      "Configured firewall and security rules",
+    ],
+  },
+  {
+    name: "AWS",
+    category: "DevOps",
+    categoryId: "devops",
+    level: "Beginner",
+    projects: 2,
+    description:
+      "Cloud infrastructure with EC2, S3, Lambda, and infrastructure-as-code deployment.",
+    achievements: [
+      "Deployed apps on EC2 instances",
+      "Set up S3 static hosting",
+      "Configured CloudWatch monitoring",
+    ],
+  },
+  {
+    name: "Git",
+    category: "DevOps",
+    categoryId: "devops",
+    level: "Advanced",
+    projects: 20,
+    description:
+      "Version control with branching strategies, rebasing, cherry-picking, and conflict resolution.",
+    achievements: [
+      "Managed 20+ project repositories",
+      "Implemented Git Flow workflow",
+      "Resolved complex merge conflicts",
+    ],
+  },
+  {
+    name: "GitHub",
+    category: "DevOps",
+    categoryId: "devops",
+    level: "Advanced",
+    projects: 20,
+    description:
+      "Repository management with Actions CI/CD, pull requests, code reviews, and issue tracking.",
+    achievements: [
+      "Built GitHub Actions pipelines",
+      "Automated deployment workflows",
+      "Managed team collaboration flows",
+    ],
+  },
+  {
+    name: "Figma",
+    category: "Design",
+    categoryId: "design",
+    level: "Intermediate",
+    projects: 4,
+    description:
+      "UI/UX design and prototyping with component libraries, auto-layout, and design systems.",
+    achievements: [
+      "Created component libraries",
+      "Designed responsive layouts",
+      "Built interactive prototypes",
+    ],
+  },
+  {
+    name: "VS Code",
+    category: "Design",
+    categoryId: "design",
+    level: "Advanced",
+    projects: 20,
+    description:
+      "Primary development environment with extensions, snippets, and integrated debugging.",
+    achievements: [
+      "Customized 20+ workflow extensions",
+      "Built VS Code snippets library",
+      "Configured multi-root workspaces",
+    ],
+  },
 ];
 
-/* ---------------------------------------------------------------------- */
-/*  SVG Spider Web — radial + concentric threads with golden shimmer       */
-/* ---------------------------------------------------------------------- */
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  CONNECTION MAP                                                       */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-function SpiderWeb({
-  mouseX,
-  mouseY,
-}: {
-  mouseX: number;
-  mouseY: number;
-}) {
-  const cx = 500;
-  const cy = 400;
-  const numRadials = 16;
-  const numRings = 7;
-  const maxRadius = 380;
+const CONNECTIONS: [string, string][] = [
+  ["Java", "Spring Boot"],
+  ["React", "JavaScript"],
+  ["React", "TypeScript"],
+  ["FastAPI", "Python"],
+  ["Docker", "AWS"],
+  ["Git", "GitHub"],
+  ["MongoDB", "FastAPI"],
+  ["Spring Boot", "MySQL"],
+  ["Tailwind CSS", "React"],
+  ["JavaScript", "TypeScript"],
+  ["REST API", "Spring Boot"],
+  ["REST API", "FastAPI"],
+  ["JWT", "Spring Boot"],
+  ["Socket.IO", "React"],
+  ["CSS3", "Tailwind CSS"],
+  ["Docker", "Linux"],
+  ["GitHub", "Docker"],
+];
 
-  const webRadius = useSpring(maxRadius, { stiffness: 30, damping: 20 });
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  CATEGORY ORDER & CONFIG                                              */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-  const lines = useMemo(() => {
-    const radialLines: string[] = [];
-    const ringLines: string[] = [];
+const CATEGORY_ORDER = [
+  { id: "programming", label: "Programming" },
+  { id: "frontend", label: "Frontend" },
+  { id: "backend", label: "Backend" },
+  { id: "database", label: "Database" },
+  { id: "devops", label: "DevOps" },
+  { id: "design", label: "Design" },
+];
 
-    // Radial threads
-    for (let i = 0; i < numRadials; i++) {
-      const angle = (i / numRadials) * Math.PI * 2;
-      const x2 = cx + Math.cos(angle) * maxRadius;
-      const y2 = cy + Math.sin(angle) * maxRadius;
-      radialLines.push(`M ${cx} ${cy} L ${x2} ${y2}`);
-    }
+const CATEGORY_DOTS: Record<string, string> = {
+  programming: "#D8C3A5",
+  frontend: "#B8C9B2",
+  backend: "#D8C3A5",
+  database: "#B8C9B2",
+  devops: "#D8C3A5",
+  design: "#B8C9B2",
+};
 
-    // Concentric rings
-    for (let r = 1; r <= numRings; r++) {
-      const radius = (r / numRings) * maxRadius;
-      const points: string[] = [];
-      for (let i = 0; i <= numRadials; i++) {
-        const angle = (i / numRadials) * Math.PI * 2;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-        points.push(`${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
-      }
-      ringLines.push(points.join(" "));
-    }
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  HEXAGON COMPONENT                                                    */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-    return { radialLines, ringLines };
-  }, []);
+const hexContainerVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.7 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delay: 0.15 + i * 0.04,
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  }),
+};
 
-  // Mouse distortion — subtle bend when cursor is near the web center
-  const distortX = useTransform(mouseX, [0, 500, 1000], [0, 20, 0]);
-  const distortY = useTransform(mouseY, [0, 400, 800], [0, 15, 0]);
-
-  return (
-    <motion.svg
-      viewBox="0 0 1000 800"
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ filter: "drop-shadow(0 0 20px rgba(216,195,165,0.08))" }}
-    >
-      <defs>
-        <linearGradient id="webGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="rgba(96,122,85,0.3)" />
-          <stop offset="50%" stopColor="rgba(216,195,165,0.25)" />
-          <stop offset="100%" stopColor="rgba(96,122,85,0.3)" />
-        </linearGradient>
-      </defs>
-
-      {/* Radial threads */}
-      {lines.radialLines.map((d, i) => (
-        <motion.path
-          key={`r-${i}`}
-          d={d}
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{
-            duration: 1.5,
-            delay: i * 0.04,
-            ease: "easeOut",
-          }}
-          stroke="url(#webGrad)"
-          strokeWidth="0.8"
-          fill="none"
-          style={{
-            transform: `translate(${distortX.get()}px, ${distortY.get()}px)`,
-          }}
-        />
-      ))}
-
-      {/* Concentric rings */}
-      {lines.ringLines.map((d, i) => (
-        <motion.path
-          key={`c-${i}`}
-          d={d}
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{
-            duration: 1.2,
-            delay: 0.5 + i * 0.1,
-            ease: "easeOut",
-          }}
-          stroke="rgba(216,195,165,0.15)"
-          strokeWidth="0.6"
-          fill="none"
-        />
-      ))}
-
-      {/* Center node — golden glow */}
-      <motion.circle
-        cx={cx}
-        cy={cy}
-        r="4"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 2.2, type: "spring" }}
-        fill="rgba(216,195,165,0.6)"
-      />
-      <motion.circle
-        cx={cx}
-        cy={cy}
-        r="12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.4, 0.15, 0.3, 0] }}
-        transition={{ delay: 2.2, duration: 2, repeat: Infinity, repeatDelay: 3 }}
-        fill="rgba(216,195,165,0.15)"
-      />
-    </motion.svg>
-  );
+interface HexagonProps {
+  skill: Skill;
+  index: number;
+  isHovered: boolean;
+  isNeighbor: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  onClick: () => void;
+  reducedMotion: boolean;
 }
 
-/* ---------------------------------------------------------------------- */
-/*  Hanging Skill Badge — swings from a silk thread                       */
-/* ---------------------------------------------------------------------- */
-
-function HangingSkill({
-  name,
-  x,
-  y,
-  delay,
-  mouseX,
-  mouseY,
-}: {
-  name: string;
-  x: number;
-  y: number;
-  delay: number;
-  mouseX: number;
-  mouseY: number;
-}) {
-  const badgeRef = useRef<HTMLDivElement>(null);
-
-  // Pendulum swing — each badge has unique timing
-  const swingX = useTransform(
-    () => Math.sin(Date.now() * 0.001 + delay * 0.5) * 3 + Math.sin(Date.now() * 0.0007 + delay) * 2
-  );
-  const swingY = useTransform(
-    () => Math.cos(Date.now() * 0.0009 + delay * 0.3) * 1.5 + Math.sin(Date.now() * 0.0012 + delay * 0.8) * 1
-  );
-
-  // Continuous animation frame for organic swing
-  const time = useMotionValue(0);
-
-  const swingRotate = useTransform(time, (t) => {
-    const base = Math.sin(t * 0.001 + delay * 0.7) * 4; // degrees
-    const wobble = Math.sin(t * 0.0023 + delay * 1.1) * 1.5;
-    return base + wobble;
-  });
-
-  const swingTranslateX = useTransform(time, (t) => {
-    const base = Math.sin(t * 0.001 + delay * 0.7) * 12;
-    const wobble = Math.sin(t * 0.0017 + delay * 0.9) * 5;
-    return base + wobble;
-  });
-
-  const swingTranslateY = useTransform(time, (t) => {
-    return Math.cos(t * 0.0008 + delay * 0.4) * 4;
-  });
-
-  // Mouse proximity reaction
-  const proximity = useTransform(
-    [mouseX, mouseY],
-    ([mx, my]) => {
-      const dx = mx - x;
-      const dy = my - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      return Math.max(0, 1 - dist / 250);
-    },
-    [0]
-  );
-
-  const mouseRotate = useTransform(proximity, (p) => p * 15);
-  const mouseScale = useTransform(proximity, (p) => 1 + p * 0.12);
-  const mouseY_offset = useTransform(proximity, (p) => -p * 20);
-
-  const rotate = useSpring(useTransform(
-    [swingRotate, mouseRotate],
-    ([s, m]) => s + m
-  ), { stiffness: 100, damping: 15 });
-
-  const translateX = useSpring(useTransform(
-    [swingTranslateX, mouseRotate],
-    ([s, m]) => s + m * 0.8
-  ), { stiffness: 80, damping: 12 });
-
-  const translateY = useSpring(useTransform(
-    [swingTranslateY, mouseY_offset],
-    ([s, m]) => s + m
-  ), { stiffness: 80, damping: 12 });
-
-  const scale = useSpring(mouseScale, { stiffness: 120, damping: 20 });
-
-  // Start the time animation
-  const isInView = useInView(badgeRef, { once: true, margin: "-50px" });
+const Hexagon = memo(function Hexagon({
+  skill,
+  index,
+  isHovered,
+  isNeighbor,
+  onHover,
+  onLeave,
+  onClick,
+  reducedMotion,
+}: HexagonProps) {
+  const Icon = TECH_ICONS[skill.name] || SiNodedotjs;
+  const brand = BRANDS[skill.name];
+  const isActive = isHovered || isNeighbor;
 
   return (
     <motion.div
-      ref={badgeRef}
-      initial={{ opacity: 0, y: -60 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, delay: delay, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute"
+      variants={hexContainerVariants}
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      className="relative"
       style={{
-        left: x,
-        top: y,
-        zIndex: 10,
+        width: "clamp(88px, 10vw, 115px)",
+        height: "clamp(100px, 11.5vw, 132px)",
       }}
     >
-      {/* Silk thread */}
-      <motion.div
-        style={{
-          width: "1px",
-          height: "30px",
-          background: "linear-gradient(to bottom, rgba(216,195,165,0.3), rgba(216,195,165,0.05))",
-          marginLeft: "50%",
-          transformOrigin: "top center",
-          rotate: rotate,
-          translateX: translateX,
-        }}
-      />
-
-      {/* Badge */}
-      <motion.div
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -60 }}
-        transition={{ duration: 0.6, delay: delay + 0.3 }}
-        style={{
-          transform: `translate(${translateX.get()}px, ${translateY.get()}px)`,
-          scale,
-        }}
-        whileHover={{
-          scale: 1.06,
-          y: -6,
-          transition: { duration: 0.3 },
-        }}
-        className="relative cursor-pointer"
-        onMouseEnter={() => {
-          // Add time-based animation on mount
-          startSwingAnimation(time);
+      {/* SVG hexagon shape with gradient border */}
+      <motion.svg
+        className="absolute inset-0 w-full h-full"
+        viewBox="0 0 100 115"
+        preserveAspectRatio="xMidYMid meet"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{
+          delay: 0.15 + index * 0.04,
+          duration: 0.5,
+          ease: [0.16, 1, 0.3, 1],
         }}
       >
-        <div
-          className="px-4 py-2 rounded-full backdrop-blur-md border shadow-lg whitespace-nowrap transition-all duration-300 hover:shadow-[0_0_20px_rgba(216,195,165,0.15)]"
-          style={{
-            background: "linear-gradient(135deg, rgba(96,122,85,0.25), rgba(96,122,85,0.12))",
-            border: "1px solid rgba(216,195,165,0.3)",
-            boxShadow: "0 4px 15px rgba(30,58,47,0.3)",
-          }}
-        >
-          <span
-            className="text-[11px] font-semibold text-[#F5F1EA] tracking-wide"
-            style={{ fontFamily: soria }}
+        <defs>
+          <linearGradient
+            id={`border-grad-${skill.name}`}
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
           >
-            {name}
+            <stop
+              offset="0%"
+              stopColor={isActive ? brand.primary : `${brand.primary}50`}
+            />
+            <stop
+              offset="100%"
+              stopColor={isActive ? `${brand.primary}aa` : `${brand.primary}20`}
+            />
+          </linearGradient>
+        </defs>
+        <polygon
+          points="50,2 96,27 96,88 50,113 4,88 4,27"
+          fill={brand.bg}
+          stroke={`url(#border-grad-${skill.name})`}
+          strokeWidth={isActive ? 2 : 1}
+          style={{
+            filter: isActive
+              ? `drop-shadow(0 0 8px ${brand.glow})`
+              : "none",
+            transition: "filter 0.2s ease, stroke-width 0.2s ease",
+          }}
+        />
+      </motion.svg>
+
+      {/* Interactive click area */}
+      <motion.button
+        className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer outline-none z-10"
+        style={{
+          clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+          background: isActive
+            ? `radial-gradient(ellipse at center, ${brand.glow}, transparent 70%)`
+            : "transparent",
+          transition: "background 0.25s ease",
+        }}
+        whileHover={
+          reducedMotion
+            ? {}
+            : {
+                scale: 1.12,
+                y: -6,
+                rotate: 2,
+                transition: { duration: 0.2, ease: "easeOut" },
+              }
+        }
+        whileTap={
+          reducedMotion
+            ? {}
+            : {
+                scale: 0.92,
+                transition: { duration: 0.1 },
+              }
+        }
+        onMouseEnter={onHover}
+        onMouseLeave={onLeave}
+        onClick={onClick}
+        aria-label={`${skill.name} - ${skill.category}`}
+        role="button"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? {}
+              : {
+                  y: [0, -3, 0],
+                  transition: {
+                    duration: 3 + (index % 5) * 0.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                }
+          }
+          className="flex flex-col items-center gap-1"
+        >
+          <motion.div
+            animate={
+              reducedMotion
+                ? {}
+                : isHovered
+                ? { rotate: [0, -5, 5, 0], transition: { duration: 0.4 } }
+                : {}
+            }
+          >
+            <Icon
+              size={28}
+              className="transition-colors duration-200"
+              style={{
+                color: isActive ? brand.text : `${brand.text}88`,
+              }}
+            />
+          </motion.div>
+          <span
+            className="text-[9px] md:text-[10px] font-semibold text-center leading-tight tracking-wide max-w-[68px]"
+            style={{
+              fontFamily: "'Soria', 'Century Gothic', sans-serif",
+              color: isActive ? brand.text : "rgba(245,241,234,0.7)",
+              transition: "color 0.2s ease",
+            }}
+          >
+            {skill.name}
           </span>
+        </motion.div>
+      </motion.button>
+    </motion.div>
+  );
+});
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  DETAIL PANEL                                                         */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+interface DetailPanelProps {
+  skill: Skill;
+  onClose: () => void;
+  reducedMotion: boolean;
+}
+
+function DetailPanel({ skill, onClose, reducedMotion }: DetailPanelProps) {
+  const Icon = TECH_ICONS[skill.name] || SiNodedotjs;
+  const brand = BRANDS[skill.name];
+
+  // Calculate proficiency percentage
+  const levelPercent = useMemo(() => {
+    const map: Record<string, number> = {
+      Beginner: 35,
+      Intermediate: 60,
+      Advanced: 85,
+      Expert: 95,
+    };
+    return map[skill.level] || 50;
+  }, [skill.level]);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${skill.name} details`}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-[#0d1a15]/80 backdrop-blur-md" />
+
+      {/* Panel */}
+      <motion.div
+        initial={
+          reducedMotion
+            ? { opacity: 1 }
+            : { opacity: 0, y: 40, scale: 0.95 }
+        }
+        animate={
+          reducedMotion
+            ? { opacity: 1 }
+            : { opacity: 1, y: 0, scale: 1 }
+        }
+        exit={
+          reducedMotion
+            ? { opacity: 0 }
+            : { opacity: 0, y: 30, scale: 0.95 }
+        }
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-lg rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(30,58,47,0.95) 0%, rgba(13,26,21,0.98) 100%)",
+          border: `1px solid ${brand.border}`,
+          boxShadow: `0 0 40px ${brand.glow}, 0 24px 80px rgba(0,0,0,0.5)`,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-4 px-6 py-5">
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-xl shrink-0"
+            style={{
+              background: brand.bg,
+              border: `1px solid ${brand.border}`,
+              boxShadow: `0 0 20px ${brand.glow}`,
+            }}
+          >
+            <Icon size={30} style={{ color: brand.text }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3
+              className="text-xl font-bold tracking-tight truncate"
+              style={{
+                fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                color: brand.text,
+              }}
+            >
+              {skill.name}
+            </h3>
+            <p
+              className="text-xs mt-0.5"
+              style={{
+                fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                color: "rgba(184,201,178,0.8)",
+              }}
+            >
+              {skill.category}
+            </p>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ duration: 0.15 }}
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full"
+            style={{
+              background: "rgba(184,201,178,0.1)",
+              border: "1px solid rgba(184,201,178,0.15)",
+            }}
+            aria-label="Close panel"
+          >
+            <X size={16} className="text-[#B8C9B2]" />
+          </motion.button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 pb-6 space-y-4">
+          {/* Description */}
+          <p
+            className="text-sm leading-relaxed"
+            style={{
+              fontFamily: "'Soria', 'Century Gothic', sans-serif",
+              color: "rgba(184,201,178,0.9)",
+            }}
+          >
+            {skill.description}
+          </p>
+
+          {/* Meta row */}
+          <div className="flex items-center gap-3">
+            <span
+              className="text-[10px] px-3 py-1 rounded-full font-semibold"
+              style={{
+                fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                background: brand.bg,
+                border: `1px solid ${brand.border}`,
+                color: brand.text,
+              }}
+            >
+              {skill.level}
+            </span>
+            <span
+              className="text-[10px] flex items-center gap-1"
+              style={{
+                fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                color: "rgba(184,201,178,0.7)",
+              }}
+            >
+              <Star size={10} style={{ color: brand.text }} />
+              {skill.projects} projects
+            </span>
+          </div>
+
+          {/* Progress indicator */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span
+                className="text-[10px] font-semibold uppercase tracking-widest"
+                style={{
+                  fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                  color: "rgba(97,122,85,0.5)",
+                }}
+              >
+                Proficiency
+              </span>
+              <span
+                className="text-[10px] font-bold"
+                style={{
+                  fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                  color: brand.text,
+                }}
+              >
+                {levelPercent}%
+              </span>
+            </div>
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ background: "rgba(97,122,85,0.15)" }}
+            >
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${levelPercent}%` }}
+                transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="h-full rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, ${brand.primary}, ${brand.text})`,
+                  boxShadow: `0 0 8px ${brand.glow}`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Achievements */}
+          <div>
+            <p
+              className="text-[10px] font-semibold uppercase tracking-widest mb-2"
+              style={{
+                fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                color: "rgba(97,122,85,0.5)",
+              }}
+            >
+              Key Achievements
+            </p>
+            <ul className="space-y-1.5">
+              {skill.achievements.map((achievement, i) => (
+                <motion.li
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.1, duration: 0.3 }}
+                  className="flex items-start gap-2"
+                >
+                  <ChevronRight
+                    size={12}
+                    className="mt-0.5 shrink-0"
+                    style={{ color: brand.primary }}
+                  />
+                  <span
+                    className="text-xs"
+                    style={{
+                      fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                      color: "rgba(184,201,178,0.85)",
+                    }}
+                  >
+                    {achievement}
+                  </span>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+
+          {/* GitHub link */}
+          {skill.github && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.3 }}
+              className="pt-3 border-t"
+              style={{ borderColor: "rgba(97,122,85,0.15)" }}
+            >
+              <a
+                href={skill.github}
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold transition-all duration-200 hover:gap-2.5"
+                style={{
+                  fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                  color: brand.text,
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink size={12} />
+                View on GitHub
+              </a>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
-// Helper to start continuous swing animation
-function startSwingAnimation(time: any) {
-  if (typeof time === "number") return;
-  // Use requestAnimationFrame for organic continuous motion
-  let startTime = Date.now();
-  const tick = () => {
-    time.set(Date.now() - startTime);
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  ANIMATED BACKGROUND LAYERS                                           */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-/* ---------------------------------------------------------------------- */
-/*  Dust Particles — subtle floating particles                            */
-/* ---------------------------------------------------------------------- */
-
-function DustParticles() {
-  const particles = useMemo(() => {
-    return Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 2 + 0.5,
-      duration: Math.random() * 8 + 6,
-      delay: Math.random() * 5,
-      opacity: Math.random() * 0.3 + 0.1,
-    }));
-  }, []);
-
+function AnimatedBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            background: "rgba(216,195,165,0.4)",
-            opacity: p.opacity,
-          }}
-          animate={{
-            y: [0, -30, 10, -20, 0],
-            x: [0, 15, -10, 5, 0],
-            opacity: [p.opacity, p.opacity * 0.5, p.opacity, p.opacity * 0.3, p.opacity],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
+      {/* Animated gradient — recolored */}
+      <motion.div
+        animate={{
+          background: [
+            "radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.06), transparent 50%)",
+            "radial-gradient(ellipse at 80% 20%, rgba(97,122,85,0.05), transparent 50%)",
+            "radial-gradient(ellipse at 50% 80%, rgba(216,195,165,0.04), transparent 50%)",
+            "radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.06), transparent 50%)",
+          ],
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0"
+      />
+
+      {/* Soft mesh — recolored */}
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(216,195,165,0.02) 0%, transparent 30%, rgba(97,122,85,0.02) 50%, transparent 70%, rgba(184,201,178,0.02) 100%)",
+        }}
+      />
+
+      {/* Floating blurred circles — recolored */}
+      <motion.div
+        className="absolute top-[15%] left-[10%] w-64 h-64 rounded-full blur-[100px]"
+        style={{ background: "rgba(216,195,165,0.05)" }}
+        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-[60%] right-[15%] w-80 h-80 rounded-full blur-[120px]"
+        style={{ background: "rgba(97,122,85,0.04)" }}
+        animate={{ x: [0, -25, 0], y: [0, 15, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-[10%] left-[30%] w-56 h-56 rounded-full blur-[90px]"
+        style={{ background: "rgba(184,201,178,0.03)" }}
+        animate={{ x: [0, 20, 0], y: [0, -10, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Subtle grid — recolored */}
+      <div
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(184,201,178,0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(184,201,178,0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* Noise texture */}
+      <div
+        className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+          backgroundSize: "128px 128px",
+        }}
+      />
     </div>
   );
 }
 
-/* ---------------------------------------------------------------------- */
-/*  Main Component                                                         */
-/* ---------------------------------------------------------------------- */
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  SVG CONNECTION LINES                                                  */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-export default function SpiderWebSkills() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+interface ConnectionLinesProps {
+  hoveredSkill: string | null;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  positions: Map<string, { x: number; y: number }>;
+}
 
-  // Mouse tracking
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(500);
-  const mouseY = useMotionValue(400);
+function ConnectionLines({
+  hoveredSkill,
+  containerRef,
+  positions,
+}: ConnectionLinesProps) {
+  const paths = useMemo(() => {
+    if (!hoveredSkill) return [];
+    const fromPos = positions.get(hoveredSkill);
+    if (!fromPos) return [];
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      mouseX.set(e.clientX - rect.left);
-      mouseY.set(e.clientY - rect.top);
-    },
-    [mouseX, mouseY]
+    return CONNECTIONS.filter(
+      ([a, b]) => a === hoveredSkill || b === hoveredSkill,
+    )
+      .map(([a, b]) => {
+        const other = a === hoveredSkill ? b : a;
+        const toPos = positions.get(other);
+        if (!toPos) return null;
+        return {
+          from: fromPos,
+          to: toPos,
+          tech: other,
+        };
+      })
+      .filter(Boolean) as {
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+      tech: string;
+    }[];
+  }, [hoveredSkill, positions]);
+
+  if (paths.length === 0) return null;
+
+  const container = containerRef.current;
+  if (!container) return null;
+  const rect = container.getBoundingClientRect();
+
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 20 }}
+    >
+      <defs>
+        {paths.map((p, i) => (
+          <linearGradient
+            key={`conn-grad-${i}`}
+            id={`conn-${i}`}
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="0%"
+          >
+            <stop
+              offset="0%"
+              stopColor={BRANDS[hoveredSkill!]?.primary || "#D8C3A5"}
+              stopOpacity="0.6"
+            />
+            <stop
+              offset="100%"
+              stopColor={BRANDS[p.tech]?.primary || "#D8C3A5"}
+              stopOpacity="0.3"
+            />
+          </linearGradient>
+        ))}
+      </defs>
+      {paths.map((p, i) => {
+        const x1 = p.from.x - rect.left;
+        const y1 = p.from.y - rect.top;
+        const x2 = p.to.x - rect.left;
+        const y2 = p.to.y - rect.top;
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2 - 20;
+
+        return (
+          <motion.path
+            key={`conn-path-${i}`}
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            d={`M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`}
+            stroke={`url(#conn-${i})`}
+            strokeWidth="1.5"
+            fill="none"
+            strokeDasharray="4 3"
+            filter={`drop-shadow(0 0 4px ${BRANDS[hoveredSkill!]?.glow || "rgba(216,195,165,0.3)"})`}
+          />
+        );
+      })}
+    </svg>
   );
+}
 
-  // Position skills around the web in a natural distribution
-  const skillPositions = useMemo(() => {
-    const positions: { name: string; x: number; y: number; delay: number }[] = [];
-    const cx = 500;
-    const cy = 400;
-    const rings = [
-      { radius: 180, count: 6, angleOffset: 0 },
-      { radius: 260, count: 8, angleOffset: 0.3 },
-      { radius: 340, count: 10, angleOffset: 0.15 },
-    ];
+/* ═══════════════════════════════════════════════════════════════════════ */
+/*  MAIN COMPONENT                                                       */
+/* ═══════════════════════════════════════════════════════════════════════ */
 
-    let skillIndex = 0;
-    rings.forEach((ring) => {
-      for (let i = 0; i < ring.count && skillIndex < skills.length; i++) {
-        const angle = (i / ring.count) * Math.PI * 2 + ring.angleOffset;
-        const x = cx + Math.cos(angle) * ring.radius - 35; // center the badge
-        const y = cy + Math.sin(angle) * ring.radius - 12;
-        positions.push({
-          name: skills[skillIndex],
-          x,
-          y,
-          delay: skillIndex * 0.08,
-        });
-        skillIndex++;
-      }
-    });
+export default function HoneycombSkills() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const honeycombRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.05 });
+  const reducedMotion = useReducedMotion();
+  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [positions, setPositions] = useState<Map<string, { x: number; y: number }>>(new Map());
 
-    // Add remaining skills at outer positions
-    while (skillIndex < skills.length) {
-      const angle = (skillIndex / skills.length) * Math.PI * 2 + 0.1;
-      const radius = 390;
-      const x = cx + Math.cos(angle) * radius - 35;
-      const y = cy + Math.sin(angle) * radius - 12;
-      positions.push({
-        name: skills[skillIndex],
-        x,
-        y,
-        delay: skillIndex * 0.08,
+  // Track hexagon positions for SVG connections
+  useEffect(() => {
+    if (!honeycombRef.current) return;
+    const container = honeycombRef.current;
+
+    const updatePositions = () => {
+      const newPositions = new Map<string, { x: number; y: number }>();
+      SKILLS.forEach((skill) => {
+        const el = container.querySelector(
+          `[data-skill="${skill.name}"]`,
+        ) as HTMLElement | null;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          newPositions.set(skill.name, {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          });
+        }
       });
-      skillIndex++;
-    }
+      setPositions(newPositions);
+    };
 
-    return positions;
+    const observer = new MutationObserver(updatePositions);
+    observer.observe(container, { childList: true, subtree: true });
+    updatePositions();
+
+    const timer = setTimeout(updatePositions, 2000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [isInView]);
+
+  const handleHover = useCallback((name: string | null) => setHoveredSkill(name), []);
+  const handleClick = useCallback((skill: Skill) => setSelectedSkill(skill), []);
+  const handleClose = useCallback(() => setSelectedSkill(null), []);
+
+  // Group skills by category for rendering
+  const groupedSkills = useMemo(() => {
+    const groups: Record<string, Skill[]> = {};
+    CATEGORY_ORDER.forEach((cat) => {
+      groups[cat.id] = SKILLS.filter((s) => s.categoryId === cat.id);
+    });
+    return groups;
   }, []);
+
+  // Ripple state for click effect
+  const [ripples, setRipples] = useState<
+    { id: number; x: number; y: number; brand: BrandColors }[]
+  >([]);
+
+  const handleRipple = useCallback(
+    (skill: Skill, e: React.MouseEvent) => {
+      if (reducedMotion) return;
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const id = Date.now();
+      setRipples((prev) => [
+        ...prev,
+        { id, x, y, brand: BRANDS[skill.name] },
+      ]);
+      setTimeout(() => {
+        setRipples((prev) => prev.filter((r) => r.id !== id));
+      }, 600);
+    },
+    [reducedMotion],
+  );
 
   return (
     <section
       id="skills"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-24 md:px-10 lg:px-16"
+      ref={sectionRef}
+      className="relative overflow-hidden py-24 md:py-32"
+      style={{
+        background: "linear-gradient(180deg, #0d1a15 0%, #1E3A2F 50%, #0d1a15 100%)",
+      }}
     >
-      {/* Ambient glows */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_40%,rgba(96,122,85,0.08),transparent_60%)]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_20%_80%,rgba(216,195,165,0.04),transparent_50%)]" />
+      <AnimatedBackground />
 
-      <div className="mx-auto max-w-7xl">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6 }}
-          className="mb-16 text-center"
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-16 md:mb-20 text-center"
         >
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-[#D8C3A5]"
-            style={{ fontFamily: soria }}
+            className="text-[11px] font-semibold uppercase tracking-[0.35em]"
+            style={{
+              fontFamily: "'Soria', 'Century Gothic', sans-serif",
+              background: "linear-gradient(90deg, #D8C3A5, #B8C9B2, #617A55)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
           >
-            Skills & Technologies
+            Technical Expertise
           </p>
           <h2
-            className="mt-2 text-3xl font-bold tracking-tight text-[#F5F1EA] sm:text-4xl md:text-5xl"
-            style={{ fontFamily: soria }}
+            className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
+            style={{
+              fontFamily: "'Soria', 'Century Gothic', sans-serif",
+              color: "#F5F1EA",
+            }}
           >
-            The Web of Craftsmanship
+            Skills Universe
           </h2>
           <p
-            className="mt-3 max-w-xl mx-auto text-sm text-[#B8C9B2]"
-            style={{ fontFamily: soria }}
+            className="mt-4 max-w-lg mx-auto text-sm leading-relaxed"
+            style={{
+              fontFamily: "'Soria', 'Century Gothic', sans-serif",
+              color: "rgba(184,201,178,0.7)",
+            }}
           >
-            Each skill hangs from the web of knowledge — hover to explore, move
-            your cursor to feel the threads respond.
+            Every hexagon is a technology I work with. Hover to see connections,
+            click to explore depth.
           </p>
         </motion.div>
 
-        {/* Spider Web Container */}
-        <motion.div
-          ref={containerRef}
-          onMouseMove={handleMouseMove}
-          className="relative mx-auto rounded-[30px] overflow-hidden"
-          style={{
-            maxWidth: "1000px",
-            height: "800px",
-            background: "radial-gradient(ellipse at center, #1a3329 0%, #0d1a15 100%)",
-            border: "1px solid rgba(216,195,165,0.08)",
-            boxShadow: "inset 0 0 60px rgba(30,58,47,0.5), 0 20px 60px rgba(9,14,12,0.4)",
-          }}
+        {/* Honeycomb Grid */}
+        <div
+          ref={honeycombRef}
+          className="relative"
+          style={{ minHeight: "600px" }}
         >
-          {/* Dust particles */}
-          <DustParticles />
-
-          {/* Mist layer */}
-          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,rgba(96,122,85,0.15),transparent_70%)]" />
-
-          {/* SVG Spider Web */}
-          <SpiderWeb mouseX={mouseX} mouseY={mouseY} />
-
-          {/* Hanging Skills */}
-          <div className="absolute inset-0">
-            {skillPositions.map((skill) => (
-              <HangingSkill
-                key={skill.name}
-                name={skill.name}
-                x={skill.x}
-                y={skill.y}
-                delay={skill.delay}
-                mouseX={mouseX}
-                mouseY={mouseY}
-              />
-            ))}
-          </div>
-
-          {/* Vignette overlay */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at center, transparent 50%, rgba(13,26,21,0.6) 100%)",
-            }}
+          <ConnectionLines
+            hoveredSkill={hoveredSkill}
+            containerRef={honeycombRef}
+            positions={positions}
           />
+
+          {/* Category rows */}
+          {CATEGORY_ORDER.map((cat, catIndex) => (
+            <div key={cat.id} className="mb-8 last:mb-0">
+              {/* Category label */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: catIndex * 0.15, duration: 0.4 }}
+                className="flex items-center gap-2 mb-4"
+              >
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: CATEGORY_DOTS[cat.id] }}
+                />
+                <span
+                  className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+                  style={{
+                    fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                    color: "rgba(184,201,178,0.4)",
+                  }}
+                >
+                  {cat.label}
+                </span>
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: "rgba(97,122,85,0.08)" }}
+                />
+                <span
+                  className="text-[10px]"
+                  style={{
+                    fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                    color: "rgba(184,201,178,0.25)",
+                  }}
+                >
+                  {groupedSkills[cat.id].length}
+                </span>
+              </motion.div>
+
+              {/* Hexagons row */}
+              <div
+                className="flex flex-wrap items-center justify-center gap-2 md:gap-3"
+                style={{
+                  marginLeft: catIndex % 2 === 1 ? "clamp(20px, 4vw, 50px)" : 0,
+                }}
+              >
+                {groupedSkills[cat.id].map((skill, skillIndex) => (
+                  <div
+                    key={skill.name}
+                    data-skill={skill.name}
+                    className="relative"
+                  >
+                    {/* Ripple effect */}
+                    {ripples
+                      .filter((r) => r.brand === BRANDS[skill.name])
+                      .map((ripple) => (
+                        <motion.div
+                          key={ripple.id}
+                          initial={{ scale: 0, opacity: 0.6 }}
+                          animate={{ scale: 3, opacity: 0 }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className="absolute inset-0 rounded-full pointer-events-none z-20"
+                          style={{
+                            left: ripple.x,
+                            top: ripple.y,
+                            width: 40,
+                            height: 40,
+                            marginLeft: -20,
+                            marginTop: -20,
+                            background: `radial-gradient(circle, ${ripple.brand.glow}, transparent 70%)`,
+                          }}
+                        />
+                      ))}
+
+                    <Hexagon
+                      skill={skill}
+                      index={
+                        CATEGORY_ORDER.findIndex((c) => c.id === cat.id) * 10 +
+                        skillIndex
+                      }
+                      isHovered={hoveredSkill === skill.name}
+                      isNeighbor={
+                        hoveredSkill
+                          ? CONNECTIONS.some(
+                              ([a, b]) =>
+                                (a === hoveredSkill && b === skill.name) ||
+                                (b === hoveredSkill && a === skill.name),
+                            )
+                          : false
+                      }
+                      onHover={() => handleHover(skill.name)}
+                      onLeave={() => handleHover(null)}
+                      onClick={(e: React.MouseEvent) => {
+                        handleRipple(skill, e);
+                        handleClick(skill);
+                      }}
+                      reducedMotion={reducedMotion}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Category Legend */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ delay: 2, duration: 0.4 }}
+          className="mt-16 flex flex-wrap items-center justify-center gap-5 md:gap-8"
+        >
+          {CATEGORY_ORDER.map((cat) => (
+            <div key={cat.id} className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  background: CATEGORY_DOTS[cat.id],
+                  boxShadow: `0 0 8px ${CATEGORY_DOTS[cat.id]}40`,
+                }}
+              />
+              <span
+                className="text-[10px] tracking-wide"
+                style={{
+                  fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                  color: "rgba(184,201,178,0.5)",
+                }}
+              >
+                {cat.label}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ delay: 2.2, duration: 0.4 }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-12"
+        >
+          {[
+            { value: SKILLS.length, label: "Technologies" },
+            { value: CATEGORY_ORDER.length, label: "Domains" },
+            {
+              value: SKILLS.reduce((a, s) => a + s.projects, 0),
+              label: "Projects",
+            },
+          ].map((stat, i) => (
+            <div key={i} className="flex items-center gap-6 md:gap-12">
+              {i > 0 && (
+                <div
+                  className="h-8 w-px"
+                  style={{ background: "rgba(97,122,85,0.15)" }}
+                />
+              )}
+              <div className="text-center">
+                <p
+                  className="text-2xl md:text-3xl font-bold"
+                  style={{
+                    fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                    background:
+                      "linear-gradient(135deg, #D8C3A5, #B8C9B2)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {stat.value}
+                </p>
+                <p
+                  className="text-[10px] tracking-wider uppercase mt-1"
+                  style={{
+                    fontFamily: "'Soria', 'Century Gothic', sans-serif",
+                    color: "rgba(184,201,178,0.4)",
+                  }}
+                >
+                  {stat.label}
+                </p>
+              </div>
+            </div>
+          ))}
         </motion.div>
       </div>
+
+      {/* Detail Panel */}
+      <AnimatePresence>
+        {selectedSkill && (
+          <DetailPanel
+            skill={selectedSkill}
+            onClose={handleClose}
+            reducedMotion={reducedMotion}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

@@ -577,7 +577,7 @@ export default function Achievements() {
   return (
     <section
       id="achievements"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-7 md:px-10 lg:px-16"
+      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-25 md:px-10 lg:px-16"
     >
       {/* Ambient glows */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_20%_40%,rgba(216,195,165,0.06),transparent_50%)]" />

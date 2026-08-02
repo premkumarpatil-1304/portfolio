@@ -23,11 +23,9 @@ export default function SkillsOverview() {
   return (
     <section
       id="skills"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-10 md:px-10 lg:px-16"
+      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-24 md:px-10 lg:px-16"
     >
-      {/* Ambient glows */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_30%_20%,rgba(96,122,85,0.1),transparent_55%)]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_70%_80%,rgba(216,195,165,0.05),transparent_50%)]" />
+      {/* No gradients — flat background like other components */}
 
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
@@ -65,16 +63,16 @@ export default function SkillsOverview() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="group rounded-3xl border border-[#617A55]/25 bg-[#617A55]/10 p-6 shadow-lg shadow-[#1E3A2F]/40 backdrop-blur-xl space-y-4 transition-all hover:border-[#D8C3A5]/30 hover:shadow-xl hover:shadow-[#D8C3A5]/8"
+                className="group rounded-3xl border border-[#D8C3A5]/20 bg-[#617A55]/10 p-6 shadow-lg shadow-[#1E3A2F]/40 backdrop-blur-xl space-y-4 transition-all hover:border-[#D8C3A5]/40 hover:shadow-xl hover:shadow-[#D8C3A5]/10"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D8C3A5]/10 text-[#D8C3A5] border border-[#D8C3A5]/20 transition-all group-hover:bg-[#D8C3A5]/15">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D8C3A5]/10 text-[#D8C3A5] border border-[#D8C3A5]/20 transition-all group-hover:bg-[#D8C3A5]/20 group-hover:scale-105">
                       <Icon size={20} />
                     </div>
                     <div>
                       <h3
-                        className="text-base font-bold text-[#F5F1EA]"
+                        className="text-base font-bold text-[#F5F1EA] group-hover:text-[#D8C3A5] transition-colors duration-300"
                         style={{ fontFamily: soria }}
                       >
                         {skill.name}
@@ -97,13 +95,13 @@ export default function SkillsOverview() {
                 </div>
 
                 {/* Progress Track */}
-                <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#1E3A2F]/60">
+                <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-[#1E3A2F]/40 border border-[#D8C3A5]/10">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${skill.percentage}%` }}
                     viewport={{ once: true, amount: 0.5 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full rounded-full bg-gradient-to-r from-[#617A55] to-[#D8C3A5] shadow-md shadow-[#617A55]/30"
+                    className="h-full rounded-full bg-[#D8C3A5] shadow-md shadow-[#D8C3A5]/20"
                   />
                 </div>
               </motion.div>

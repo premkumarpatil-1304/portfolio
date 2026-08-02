@@ -5,15 +5,19 @@ import { Menu, X, Sun, Moon, FileText, Sparkles } from "lucide-react";
 import clsx from "clsx";
 import { useTheme } from "./ThemeContext";
 import { motion } from "framer-motion";
+import { ThemeToggle } from "./ThemeContext";
+
+// In your navbar:
+<ThemeToggle />
 
 const navLinks = [
   { name: "About", href: "#about" },
-  { name: "Tech Stack", href: "#tech-stack" },
+   { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
   { name: "Experience", href: "#experience" },
   { name: "Roadmap", href: "#roadmap" },
   { name: "Achievements", href: "#achievements" },
-  { name: "Skills", href: "#skills" },
+ 
   { name: "Contact", href: "#contact" },
 ];
 

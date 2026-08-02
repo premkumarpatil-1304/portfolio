@@ -120,7 +120,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-10 md:px-10 lg:px-16"
+      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-24 md:px-10 lg:px-16"
     >
       {/* Subtle ambient glow */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(96,122,85,0.1),transparent_60%)]" />

@@ -31,7 +31,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-10 md:px-10 lg:px-16"
+      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-25 md:px-10 lg:px-16"
     >
       {/* Ambient glows */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_20%_30%,rgba(96,122,85,0.1),transparent_55%)]" />

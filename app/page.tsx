@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/ThemeContext";
 import Loader from "@/components/Loader";
-import CustomCursor from "@/components/CustomCursor";
 import ScrollProgress from "@/components/ScrollProgress";
 import AmbientBackground from "@/components/AmbientBackground";
 import Navbar from "@/components/Navbar";
@@ -17,6 +16,8 @@ import Achievements from "@/components/Achievements";
 import SkillsOverview from "@/components/SkillsOverview";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ForestCursor from "@/components/ForestCursor";
+import StickyCursor from "@/components/StickyCursor";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,9 +33,10 @@ export default function HomePage() {
   return (
     <ThemeProvider>
       <Loader isLoading={isLoading} />
-      <CustomCursor />
+      
       <ScrollProgress />
       <AmbientBackground />
+      <StickyCursor />
 
       {!isLoading && (
         <div className="relative min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
