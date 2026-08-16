@@ -136,7 +136,7 @@ function AskPremTerminal() {
   };
 
   return (
-    <div className="flex flex-col h-[500px] rounded-2xl overflow-hidden border border-[#D8C3A5]/20 bg-[#0F1C16] shadow-2xl">
+    <div className="flex flex-col h-[580px] rounded-2xl overflow-hidden border border-[#D8C3A5]/20 bg-[#0F1C16] shadow-2xl">
       {/* Title Bar */}
       <div className="flex items-center justify-between bg-[#15251E] px-4 py-3 border-b border-[#D8C3A5]/10">
         <div className="flex items-center gap-2">
