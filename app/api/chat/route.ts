@@ -73,14 +73,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "messages array is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Server is missing ANTHROPIC_API_KEY" },
+        { error: "Server is missing GROQ_API_KEY" },
         { status: 500 }
       );
     }
-
+``
     // messages: [{ role: "bot" | "user", text: string }]
     let groqMessages = messages.map((m: { role: string; text: string }) => ({
       role: m.role === "bot" ? "assistant" : "user",
