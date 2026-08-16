@@ -12,7 +12,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative border-t border-[#617A55]/30 bg-[#1E3A2F] pt-16 pb-12 px-6 overflow-hidden"
+    <footer className="relative border-t border-[#617A55]/30 bg-[#1E3A2F] pt-10 pb-10 px-6 overflow-hidden"
     style={{ fontFamily: "'Soria', 'Century Gothic', sans-serif" }}>
       {/* Top glowing gradient border line */}
       <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#D8C3A5]/60 to-transparent" />
@@ -77,7 +77,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <a
-                href="https://github.com"
+                href="https://github.com/premkumarpatil-1304"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub"
@@ -86,7 +86,7 @@ export default function Footer() {
                 <GithubIcon size={18} />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/premkumarpatil1304/"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"
@@ -95,7 +95,7 @@ export default function Footer() {
                 <LinkedinIcon size={18} />
               </a>
               <a
-                href="mailto:prempatil@example.com"
+                href="mailto:13premkp@gmail.com"
                 aria-label="Email"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#617A55] bg-[#617A55]/15 text-[#D8C3A5] hover:border-[#D8C3A5] hover:bg-[#D8C3A5]/10 hover:scale-110 transition shadow-sm"
               >
@@ -117,11 +117,11 @@ export default function Footer() {
         <div className="border-t border-[#617A55]/30 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-[#A8BFA0] font-medium">
           <p>© {new Date().getFullYear()} Premkumar Patil. All rights reserved.</p>
 
-          <p className="flex items-center gap-1.5">
+          {/* <p className="flex items-center gap-1.5">
             <span>Crafted with</span>
             <Heart size={14} className="text-[#D8C3A5] fill-[#D8C3A5] animate-pulse" />
             <span>using Next.js 16 & Tailwind CSS</span>
-          </p>
+          </p> */}
         </div>
       </div>
     </footer>

@@ -23,18 +23,20 @@ const certifications: Certification[] = [
 
 const hackathons = [
   {
-    title: "MIT Kurukshetra Hackathon",
-    location: "College Level / Regional",
-    description: "Built an innovative prototype under high-pressure time constraints showcasing real-time APIs and clean UI.",
+    title: "MIT Kurukshetra Hackathon National Level",
+    location: "MIT Alandi",
+    description:
+      "Developed a scalable full-stack software application using React, FastAPI and MongoDB with reusable components, REST APIs and role-based authentication. Designed an intuitive user interface with real-time status tracking, location mapping, community engagement and role-based access for citizens and officials.",
     award: "Participant",
-    team: "4 Members",
+    team: "Solo",
     duration: "48 Hours",
     tech: ["React", "Node.js", "MongoDB"],
   },
   {
     title: "Tatva Hackathon",
-    location: "State Level",
-    description: "Developed a full-stack civic engagement platform with role-based dashboard and live tracking features.",
+    location: "LPU",
+    description:
+      "Built an AI-enabled personal finance platform using React, FastAPI and MongoDB with secure JWT authentication. Integrated AI-powered spending analysis and budgeting assistance to deliver personalized financial recommendations. Developed REST APIs and response dashboards while ensuring scalable backend architecture.",
     award: "Participant",
     team: "3 Members",
     duration: "36 Hours",
@@ -43,8 +45,9 @@ const hackathons = [
   {
     title: "Smart India Hackathon",
     location: "National Level",
-    description: "Built a civic problem reporting platform with real-time tracking, maps integration, and role-based authentication.",
-    award: "National Finalist",
+    description:
+      "Built a civic problem reporting platform with real-time tracking, maps integration, and role-based authentication.",
+    award: "Participation Certificate",
     team: "4 Members",
     duration: "72 Hours",
     tech: ["React", "Python", "AWS"],
@@ -52,7 +55,8 @@ const hackathons = [
   {
     title: "CodeSprint Hackathon",
     location: "Regional Level",
-    description: "Developed a full-stack fintech dashboard with AI-powered spending insights and JWT authentication in 24 hours.",
+    description:
+      "Developed a full-stack fintech dashboard with AI-powered spending insights and JWT authentication in 24 hours.",
     award: "Winner",
     team: "3 Members",
     duration: "24 Hours",
@@ -96,6 +100,10 @@ function StarField() {
           from { transform: translateY(0px); }
           to { transform: translateY(-2000px); }
         }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
         .achv-star-layer { position: absolute; top: 0; left: 0; background: transparent; }
         .achv-star-layer::after {
           content: "";
@@ -125,7 +133,7 @@ function StarField() {
 }
 
 /* ---------------------------------------------------------------------- */
-/*  New Hackathon Card — Flip + Modal UX                                   */
+/*  Hackathon Card — Flip + Modal UX                                       */
 /*  Card is a glass panel. On hover, a subtle shimmer sweeps across.       */
 /*  On click, a modal overlay reveals full details with a cinematic scale  */
 /* ---------------------------------------------------------------------- */

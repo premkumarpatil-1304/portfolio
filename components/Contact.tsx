@@ -104,14 +104,14 @@ export default function Contact() {
                       className="text-sm font-semibold text-[#F5F1EA]"
                       style={{ fontFamily: soria }}
                     >
-                      prempatil@example.com
+                      13premkp@gmail.com
                     </p>
                   </div>
                 </a>
 
                 {/* LinkedIn */}
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/premkumarpatil1304/"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-4 rounded-2xl border border-[#617A55]/20 bg-[#1E3A2F]/40 p-4 transition-all hover:border-[#D8C3A5]/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#D8C3A5]/5"
@@ -137,7 +137,7 @@ export default function Contact() {
 
                 {/* GitHub */}
                 <a
-                  href="https://github.com"
+                  href="https://github.com/premkumarpatil-1304"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-4 rounded-2xl border border-[#617A55]/20 bg-[#1E3A2F]/40 p-4 transition-all hover:border-[#D8C3A5]/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#D8C3A5]/5"

@@ -1,20 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type LoaderProps = {
   isLoading: boolean;
 };
 
 /* ═══════════════════════════════════════════════════════════════════════ */
-/*  CIRCUIT BOOT LOADER — Tech-inspired loading animation                 */
-/*  5 scenes: Terminal boot → Circuit draw → Progress → Text → Expand     */
+/*  CIRCUIT BOOT LOADER — Total: 3.5 seconds                              */
 /*  Palette: Forest Green / Moss Green / Champagne Gold                  */
 /* ═══════════════════════════════════════════════════════════════════════ */
 
-// Fixed (non-random) particle configs — identical on server & client,
-// which avoids the hydration mismatch that Math.random() caused.
 const DATA_PACKETS = [
   { x: 12, y: 20, size: 3, delay: 0.1, duration: 2.4 },
   { x: 78, y: 15, size: 2, delay: 0.4, duration: 2.1 },
@@ -39,42 +36,49 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
   const [scene, setScene] = useState(0);
   const [progress, setProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const hasCounted = useRef(false);
 
-  // Detect reduced-motion preference client-side only, after mount,
-  // so server and client render identically on first pass.
+  // Detect reduced-motion preference client-side only.
   useEffect(() => {
     setReducedMotion(
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     );
   }, []);
 
+  // Scene timeline — total ~3.5 seconds
+  // Scene 1: 300ms  → circuit draws, percentage starts counting at 0
+  // Scene 2: 2800ms → progress hits 100%, name reveals
+  // Scene 3: 3200ms → hexagon expand out
   useEffect(() => {
     if (!isLoading) return;
 
     const timers = [
-      setTimeout(() => setScene(1), 400),  // Scene 1: terminal boot text
-      setTimeout(() => setScene(2), 1000), // Scene 2: circuit draws
-      setTimeout(() => setScene(3), 1600), // Scene 3: progress bar counts
-      setTimeout(() => setScene(4), 2300), // Scene 4: name/text fade in
-      setTimeout(() => setScene(5), 2600), // Scene 5: hexagon expand out
+      setTimeout(() => setScene(1), 300),
+      setTimeout(() => setScene(2), 2800),
+      setTimeout(() => setScene(3), 3200),
     ];
 
     return () => timers.forEach(clearTimeout);
   }, [isLoading]);
 
-  // Deterministic progress counter (0 -> 100), no randomness.
+  // Progress counter: starts immediately when scene 1 fires (300ms)
+  // Counts 0 → 100 over 2500ms (300ms + 2500ms = 2800ms → hits 100 exactly at name reveal)
   useEffect(() => {
-    if (scene < 3) return;
+    if (scene < 1 || hasCounted.current) return;
+    hasCounted.current = true;
+
     let raf: number;
     let start: number | null = null;
-    const durationMs = 650;
+    const durationMs = 2500;
 
     const step = (ts: number) => {
       if (start === null) start = ts;
       const elapsed = ts - start;
       const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
       setProgress(pct);
-      if (pct < 100) raf = requestAnimationFrame(step);
+      if (pct < 100) {
+        raf = requestAnimationFrame(step);
+      }
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
@@ -86,7 +90,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
           style={{ background: FOREST }}
         >
@@ -119,7 +123,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
             }}
           />
 
-          {/* Floating data packets — fixed positions, no hydration mismatch */}
+          {/* Floating data packets */}
           {!reducedMotion &&
             DATA_PACKETS.map((p, i) => (
               <motion.div
@@ -148,14 +152,14 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
           {/* Center stage */}
           <div className="relative flex flex-col items-center justify-center gap-6 z-10">
 
-            {/* CIRCUIT NODE NETWORK (Scene 1-2) */}
+            {/* CIRCUIT NODE NETWORK */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={scene >= 1 ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.4 }}
               className="relative"
             >
-              <svg width="140" height="140" viewBox="0 0 140 140" fill="none">
+              <svg width="200" height="200" viewBox="0 0 140 140" fill="none">
                 {/* Connection lines */}
                 {[
                   "M70,70 L30,30",
@@ -174,7 +178,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                     strokeLinecap="round"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={
-                      scene >= 2
+                      scene >= 1
                         ? { pathLength: 1, opacity: 0.6 }
                         : {}
                     }
@@ -200,7 +204,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                     stroke={GOLD}
                     strokeWidth="1"
                     initial={{ scale: 0, opacity: 0 }}
-                    animate={scene >= 2 ? { scale: 1, opacity: 1 } : {}}
+                    animate={scene >= 1 ? { scale: 1, opacity: 1 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + i * 0.06 }}
                   />
                 ))}
@@ -216,36 +220,48 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                   transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
                 />
                 {/* Pulse ring around core */}
-                {scene >= 2 && (
-                  <motion.circle
-                    cx="70"
-                    cy="70"
-                    r="7"
-                    stroke={GOLD}
-                    strokeWidth="1.5"
-                    fill="none"
-                    initial={{ scale: 1, opacity: 0.6 }}
-                    animate={{ scale: [1, 2.4], opacity: [0.6, 0] }}
-                    transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
-                  />
-                )}
+                <motion.circle
+                  cx="70"
+                  cy="70"
+                  r="7"
+                  stroke={GOLD}
+                  strokeWidth="1.5"
+                  fill="none"
+                  initial={{ scale: 1, opacity: 0.6 }}
+                  animate={{ scale: [1, 2.4], opacity: [0.6, 0] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+                />
               </svg>
             </motion.div>
 
-            {/* TERMINAL BOOT TEXT (Scene 1) */}
+            {/* PERCENTAGE — Big bold counter that visibly counts to 100 */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={scene >= 1 ? { opacity: 1 } : {}}
               transition={{ duration: 0.3 }}
-              className="flex items-center gap-2"
-              style={{ display: scene >= 1 && scene < 3 ? "flex" : "none" }}
+              className="text-center"
             >
               <span
-                className="text-xs tracking-widest"
+                className="text-5xl sm:text-6xl font-bold font-mono tracking-tight tabular-nums"
+                style={{ color: GOLD }}
+              >
+                {progress}%
+              </span>
+            </motion.div>
+
+            {/* TERMINAL TEXT — changes when complete */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={scene >= 1 ? { opacity: 1 } : {}}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-2 -mt-1"
+            >
+              <span
+                className="text-sm tracking-widest"
                 style={{ color: MOSS, fontFamily: "monospace" }}
               >
                 {"> "}
-                {scene >= 2 ? "compiling modules..." : "booting system..."}
+                {progress >= 100 ? "system ready" : "initializing..."}
               </span>
               <motion.span
                 animate={{ opacity: [1, 0, 1] }}
@@ -256,20 +272,19 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
               </motion.span>
             </motion.div>
 
-            {/* PROGRESS BAR (Scene 3) */}
+            {/* PROGRESS BAR */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
-              animate={scene >= 3 ? { opacity: 1, y: 0 } : {}}
+              animate={scene >= 1 ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4 }}
-              className="flex flex-col items-center gap-2 w-[220px]"
-              style={{ display: scene >= 3 ? "flex" : "none" }}
+              className="flex flex-col items-center gap-0 w-[300px] sm:w-[380px]"
             >
               <div
-                className="w-full h-[3px] rounded-full overflow-hidden"
+                className="w-full h-[4px] rounded-full overflow-hidden"
                 style={{ background: "rgba(97,122,85,0.2)" }}
               >
-                <motion.div
-                  className="h-full rounded-full"
+                <div
+                  className="h-full rounded-full transition-none"
                   style={{
                     width: `${progress}%`,
                     background: `linear-gradient(90deg, ${MOSS}, ${GOLD})`,
@@ -277,47 +292,41 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                   }}
                 />
               </div>
-              <span
-                className="text-[10px] tracking-[0.2em]"
-                style={{ color: GOLD, fontFamily: "monospace" }}
-              >
-                {progress}%
-              </span>
             </motion.div>
 
-            {/* NAME / ROLE (Scene 4) */}
+            {/* NAME / ROLE — reveals when progress hits 100% */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={
-                scene >= 4
-                  ? { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+                scene >= 2
+                  ? { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
                   : {}
               }
-              className="text-center mt-2"
-              style={{ display: scene >= 4 ? "block" : "none" }}
+              className="text-center"
+              style={{ display: scene >= 2 ? "block" : "none" }}
             >
               <h1
-                className="text-2xl sm:text-3xl font-bold tracking-[0.2em] uppercase"
+                className="text-3xl sm:text-4xl font-bold tracking-[0.2em] uppercase"
                 style={{ color: CREAM, fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
               >
                 Premkumar Patil
               </h1>
               <p
-                className="mt-2 text-xs tracking-[0.35em] uppercase"
+                className="mt-2 text-sm tracking-[0.35em] uppercase"
                 style={{ color: GOLD, fontFamily: "'Soria', 'Century Gothic', sans-serif" }}
               >
                 Full Stack Developer
               </p>
             </motion.div>
 
-            {/* HEXAGON EXPAND TRANSITION (Scene 5) */}
-            {scene >= 5 && (
+            {/* HEXAGON EXPAND TRANSITION */}
+            {scene >= 3 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{
                   opacity: [0, 0.6, 1],
                   scale: [0, 1.6, 2.2],
-                  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+                  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
                 }}
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
               >
@@ -329,15 +338,15 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                     fill="rgba(216,195,165,0.08)"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.4 }}
                   />
                   {[
                     { cx: 60, cy: -35, delay: 0.1 },
-                    { cx: 105, cy: 10, delay: 0.2 },
-                    { cx: 105, cy: 110, delay: 0.3 },
-                    { cx: 60, cy: 155, delay: 0.4 },
-                    { cx: 15, cy: 110, delay: 0.5 },
-                    { cx: 15, cy: 10, delay: 0.6 },
+                    { cx: 105, cy: 10, delay: 0.15 },
+                    { cx: 105, cy: 110, delay: 0.2 },
+                    { cx: 60, cy: 155, delay: 0.25 },
+                    { cx: 15, cy: 110, delay: 0.3 },
+                    { cx: 15, cy: 10, delay: 0.35 },
                   ].map((hex, i) => (
                     <motion.polygon
                       key={i}
@@ -347,7 +356,7 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
                       fill="rgba(216,195,165,0.04)"
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: [0, 0.5, 0], scale: [0, 1, 0.8] }}
-                      transition={{ duration: 0.6, delay: hex.delay + 0.2 }}
+                      transition={{ duration: 0.5, delay: hex.delay + 0.1 }}
                     />
                   ))}
                 </svg>
@@ -359,3 +368,4 @@ export default function SeedSaplingLoader({ isLoading }: LoaderProps) {
     </AnimatePresence>
   );
 }
+  

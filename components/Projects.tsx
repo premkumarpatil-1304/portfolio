@@ -161,7 +161,7 @@ export default function Projects() {
                 placeholder="Search project or technology..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="h-11 w-full rounded-full border border-[#617A55]/30 bg-[#617A55]/10 pl-10 pr-4 text-xs text-[#F5F1EA] outline-none placeholder:text-[#617A55] focus:border-[#D8C3A5]/60 focus:bg-[#617A55]/15 transition"
+                className="h-11 w-full rounded-full border border-[#617A55]/30 bg-[#617A55]/10 pl-10 pr-4 text-s text-[#F5F1EA] outline-none placeholder:text-[#617A55] focus:border-[#D8C3A5]/60 focus:bg-[#617A55]/15 transition"
               />
             </div>
           </div>
@@ -198,30 +198,30 @@ export default function Projects() {
                   <div>
                     {/* Header icon & category */}
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D8C3A5]/15 text-[#D8C3A5] border border-[#D8C3A5]/30 shadow-md shadow-[#D8C3A5]/10">
-                        <Icon size={22} />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#D8C3A5]/15 text-[#D8C3A5] border border-[#D8C3A5]/30 shadow-md shadow-[#D8C3A5]/10">
+                        <Icon size={18} />
                       </div>
-                      <span className="rounded-full bg-[#D8C3A5]/12 border border-[#D8C3A5]/25 px-3 py-1 text-[11px] font-semibold text-[#D8C3A5] shadow-sm">
+                      <span className="rounded-full bg-[#D8C3A5]/12 border border-[#D8C3A5]/25 px-3 py-1 text-[12px] font-semibold text-[#ffffff] shadow-sm">
                         {project.category}
                       </span>
                     </div>
 
                     {/* Title & Subtitle */}
-                    <h3 className="text-xl font-bold text-[#F5F1EA] group-hover:text-[#D8C3A5] transition-colors">
+                    <h3 className="text-2xl font-extrabold text-[#F5F1EA] group-hover:text-[#D8C3A5] transition-colors">
                       {project.title}
                     </h3>
-                    <p className="mt-1 text-xs font-mono text-[#A8BFA0]">
+                    <p className="mt-0 text-xl font-stretch-75% text-[#A8BFA0]">
                       {project.subtitle}
                     </p>
 
                     {/* Description */}
-                    <p className="mt-4 text-xs leading-6 text-[#B8C9B2] line-clamp-3">
+                    <p className="mt-3 text-s leading-6 text-[#B8C9B2] line-clamp-3">
                       {project.description}
                     </p>
 
                     {/* Features list */}
-                    <div className="mt-5 space-y-1.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#D8C3A5]/70">
+                    <div className="mt-3 space-y-1.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider  text-[#D8C3A5]/70">
                         Key Features:
                       </p>
                       <div className="flex flex-wrap gap-1.5">

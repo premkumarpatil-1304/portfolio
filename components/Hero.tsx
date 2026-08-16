@@ -151,7 +151,7 @@ export default function Hero() {
             className="flex items-center justify-center lg:justify-start gap-4 pt-4"
           >
             <a
-              href="https://github.com"
+              href="https://github.com/premkumarpatil-1304"
               target="_blank"
               rel="noreferrer"
               aria-label="GitHub Profile"
@@ -160,7 +160,7 @@ export default function Hero() {
               <GithubIcon size={18} />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://linkedin.com/premkumarpatil"
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn Profile"
@@ -207,7 +207,7 @@ export default function Hero() {
                   {/* Content */}
                   <div className="relative z-10 flex flex-col items-center px-6">
                     {/* Avatar frame */}
-                    <div className="mt-16 relative mb-6 h-60 w-50 rounded-full border border-[#D8C3A5]/40 p-1 shadow-xl shadow-black/20 overflow-hidden">
+                    <div className="mt-16 relative mb-6 h-80 w-60 rounded-full border border-[#D8C3A5]/40 p-1 shadow-xl shadow-black/20 overflow-hidden">
                       <div
                         className="h-full w-full rounded-full bg-cover bg-center"
                         style={{
@@ -235,7 +235,7 @@ export default function Hero() {
                       </span>
                     </div>
 
-                    <div className="mt-8 flex items-center gap-2 rounded-full bg-[#D8C3A5]/10 px-4 py-2 text-xs text-[#D8C3A5] border border-[#D8C3A5]/20">
+                    <div className="mt-8 mb-5 flex items-center gap-2 rounded-full bg-[#D8C3A5]/10 px-4 py-2 text-xs text-[#D8C3A5] border border-[#D8C3A5]/20">
                       <span className="h-2 w-2 rounded-full bg-[#D8C3A5] animate-ping" />
                       <span>Open for Opportunities</span>
                     </div>
