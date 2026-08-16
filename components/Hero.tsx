@@ -170,7 +170,7 @@ export default function Hero() {
             </a>
             <a
               href="mailto:13premkp@gmail.com"
-              aria-label="Email Me"
+              aria-label="Email_Me"
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[#617A55] bg-[#617A55]/15 text-[#D8C3A5] transition hover:scale-110 hover:border-[#D8C3A5] hover:bg-[#D8C3A5]/10 shadow-sm"
             >
               <Mail size={18} />
