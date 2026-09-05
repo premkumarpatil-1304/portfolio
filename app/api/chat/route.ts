@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-``
+
     // messages: [{ role: "bot" | "user", text: string }]
     let groqMessages = messages.map((m: { role: string; text: string }) => ({
       role: m.role === "bot" ? "assistant" : "user",
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "openai/gpt-oss-20b",
         max_tokens: 300,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
