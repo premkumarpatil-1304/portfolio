@@ -1,5 +1,5 @@
 "use client";
-
+// sKILL COMPETENCY FILE
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Code2, Server, Terminal, Database, Brain, Cpu, Cloud } from "lucide-react";

@@ -1,102 +1,15 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import {
-  Terminal,
-  Send,
-  Sparkles,
-  Code,
-  Award,
-  Target,
-  CheckCircle2,
-  Bot,
-  User as UserIcon,
-} from "lucide-react";
+import { Terminal, Send, Sparkles, Code, Award, Target, CheckCircle2, Bot, User as UserIcon, ArrowUpRight, Lightbulb, Compass, Layers3, Cpu } from "lucide-react";
 
 const soria = "'Soria', 'Century Gothic', sans-serif";
-const PINE = "#132821";
-const EMBER = "#C88A5E";
-
-/* ---------------------------------------------------------------------- */
-/*  Chatbot knowledge base — swap in your own answers freely               */
-/* ---------------------------------------------------------------------- */
-
-const KNOWLEDGE: { keys: string[]; answer: string }[] = [
-  {
-    keys: ["About", "Who", "Yourself", "Intro"],
-    answer:
-      "I'm Premkumar Patil — a Full Stack Developer & AI Engineer. I turn complex backend logic into fast, clean interfaces and like shipping complete products, not just features.",
-  },
-  {
-    keys: ["Skill", "Stack", "Tech"],
-    answer:
-      "Core stack: React, Next.js, TypeScript, Python, FastAPI, MongoDB, PostgreSQL — comfortable owning a feature from database schema to pixel-perfect UI.",
-  },
-  {
-    keys: ["Project", "Work", "Built", "Portfolio"],
-    answer:
-      "A few I'm proud of: BeatSync (real-time sync app), FinZer (AI-driven personal finance insights), and a civic reporting platform with live tracking.",
-  },
-  {
-    keys: ["Hackathon", "Compet"],
-    answer:
-      "I've competed at national-level hackathons — MIT Kurukshetra, Tatva, Smart India Hackathon — and picked up a win at CodeSprint.",
-  },
-  {
-    keys: ["Experience", "Job", "Intern", "Alltius"],
-    answer:
-      "Currently a Technical Intern at Alltius Pvt Ltd — building REST APIs with FastAPI and React interfaces alongside the core engineering team.",
-  },
-  {
-    keys: ["Certification", "Certificate", "Course"],
-    answer:
-      "8+ certifications spanning MongoDB, SQL, C programming, and full-stack development — mostly hands-on, not just theory.",
-  },
-  {
-    keys: ["Contact", "Email", "Reach", "Hire"],
-    answer:
-      "Best way to reach me is the Contact section below, or grab my resume from the navbar to see everything in one place.",
-  },
-  {
-    keys: ["Joke", "Funny"],
-    answer: "Why do programmers prefer dark mode? Because light attracts bugs.",
-  },
-  {
-    keys: ["Hello", "Hi", "Hey"],
-    answer: "Hey! Try one of the quick commands below, or ask about my skills, projects, or experience.",
-  },
-];
-
 const QUICK_COMMANDS = ["About", "Skill", "Projects", "Experience", "Hackathons", "Contact"];
-
-function getAnswer(input: string): string {
-  const lower = input.toLowerCase();
-  const match = KNOWLEDGE.find((entry) => entry.keys.some((k) => lower.includes(k)));
-  if (match) return match.answer;
-  return "I don't have that one yet — try: about, skills, projects, experience, hackathons, contact";
-}
-
 type Message = { role: "bot" | "user"; text: string };
 
-/* ---------------------------------------------------------------------- */
-/*  Terminal-style chatbot                                                 */
-/* ---------------------------------------------------------------------- */
-
-/* ----------------------------------------------------------------------
-   Replace the AskPremTerminal function in your About.tsx with this version.
-   Everything else in the file (layout, stats, palette) stays the same —
-   only the "brain" of the chatbot changes: instead of local keyword
-   matching, it now calls /api/chat, which talks to Claude on the server.
-------------------------------------------------------------------------- */
-
 function AskPremTerminal() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "bot",
-      text: "Hi, I'm a chatbot trained on Premkumar's profile — ask me anything, real conversation this time.",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([{ role: "bot", text: "Hi, I'm a chatbot trained on Premkumar's profile — ask me anything." }]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -108,252 +21,94 @@ function AskPremTerminal() {
   const send = async (raw: string) => {
     const text = raw.trim();
     if (!text || typing) return;
-
     const nextMessages: Message[] = [...messages, { role: "user", text }];
     setMessages(nextMessages);
     setInput("");
     setTyping(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: nextMessages }),
       });
-
-      if (!res.ok) throw new Error("Request failed");
-
-      const data = await res.json();
-      setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
+      if (!response.ok) throw new Error("Request failed");
+      const data = await response.json();
+      setMessages((previous) => [...previous, { role: "bot", text: data.reply }]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", text: "Something went wrong reaching the chatbot — try again in a moment." },
-      ]);
+      setMessages((previous) => [...previous, { role: "bot", text: "Something went wrong reaching the chatbot — please try again." }]);
     } finally {
       setTyping(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-[580px] rounded-2xl overflow-hidden border border-[#D8C3A5]/20 bg-[#0F1C16] shadow-2xl">
-      {/* Title Bar */}
-      <div className="flex items-center justify-between bg-[#15251E] px-4 py-3 border-b border-[#D8C3A5]/10">
-        <div className="flex items-center gap-2">
-          <Terminal size={16} className="text-[#D8C3A5]" />
-          <span className="text-xs font-mono text-[#A8BFA0]">ask_prem.exe</span>
-        </div>
-        <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/80"></div>
-          <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/80"></div>
-          <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80"></div>
-        </div>
+    <div className="flex min-h-[560px] flex-col overflow-hidden rounded-[1.75rem] border border-[#617A55]/45 bg-[#132821] shadow-xl shadow-[#1E3A2F]/50 sm:min-h-[620px]">
+      <div className="flex items-center justify-between border-b border-[#617A55]/45 bg-[#1E3A2F] px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#D8C3A5]/30 bg-[#617A55]/25 text-[#D8C3A5]"><Terminal size={16} /></div><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F5F1EA]" style={{ fontFamily: soria }}>Ask Prem</p><p className="mt-0.5 text-[10px] text-[#B8C9B2]" style={{ fontFamily: soria }}>Interactive profile assistant</p></div></div>
+        <div className="flex gap-1.5" aria-hidden="true"><span className="h-2.5 w-2.5 rounded-full bg-[#D8C3A5]" /><span className="h-2.5 w-2.5 rounded-full bg-[#617A55]" /><span className="h-2.5 w-2.5 rounded-full bg-[#B8C9B2]" /></div>
       </div>
-
-      {/* Messages Log */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-sm scrollbar-thin scrollbar-thumb-[#617A55]/30">
-        <AnimatePresence>
-          {messages.map((msg, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-            >
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${msg.role === "user" ? "bg-[#C88A5E]/20 text-[#C88A5E]" : "bg-[#617A55]/20 text-[#A8BFA0]"}`}>
-                {msg.role === "user" ? <UserIcon size={16} /> : <Bot size={16} />}
-              </div>
-              <div className={`rounded-xl px-4 py-2 max-w-[80%] ${msg.role === "user" ? "bg-[#C88A5E]/10 text-[#F5F1EA]" : "bg-[#1A2E25] text-[#A8BFA0]"} border border-transparent ${msg.role === "bot" ? "border-[#617A55]/20" : ""}`}>
-                {msg.text}
-              </div>
-            </motion.div>
-          ))}
-          {typing && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#617A55]/20 text-[#A8BFA0]">
-                <Bot size={16} />
-              </div>
-              <div className="rounded-xl px-4 py-2 bg-[#1A2E25] text-[#A8BFA0] border border-[#617A55]/20 flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#A8BFA0] animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#A8BFA0] animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#A8BFA0] animate-bounce" style={{ animationDelay: "300ms" }}></div>
-              </div>
-            </motion.div>
-          )}
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4 font-mono text-sm scrollbar-thin scrollbar-thumb-[#617A55]/40 sm:p-6">
+        <AnimatePresence initial={false}>
+          {messages.map((message, index) => <motion.div key={`${message.role}-${index}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}><div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${message.role === "user" ? "bg-[#D8C3A5]/15 text-[#D8C3A5]" : "bg-[#617A55]/25 text-[#B8C9B2]"}`}>{message.role === "user" ? <UserIcon size={16} /> : <Bot size={16} />}</div><div className={`max-w-[84%] rounded-2xl px-4 py-3 leading-6 ${message.role === "user" ? "bg-[#D8C3A5]/12 text-[#F5F1EA]" : "border border-[#617A55]/35 bg-[#1E3A2F] text-[#B8C9B2]"}`}>{message.text}</div></motion.div>)}
+          {typing && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#617A55]/25 text-[#B8C9B2]"><Bot size={16} /></div><div className="flex items-center gap-1 rounded-2xl border border-[#617A55]/35 bg-[#1E3A2F] px-4 py-3">{[0, 150, 300].map((delay) => <span key={delay} className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#D8C3A5]" style={{ animationDelay: `${delay}ms` }} />)}</div></motion.div>}
         </AnimatePresence>
       </div>
-
-      {/* Quick Commands & Input */}
-      <div className="p-3 bg-[#15251E] border-t border-[#D8C3A5]/10">
-        <div className="flex flex-wrap gap-2 mb-3 px-1">
-          {QUICK_COMMANDS.map((cmd) => (
-            <button
-              key={cmd}
-              onClick={() => send(cmd)}
-              disabled={typing}
-              className="text-[10px] font-mono px-2 py-1 rounded-md bg-[#617A55]/20 text-[#A8BFA0] hover:bg-[#617A55]/40 hover:text-[#F5F1EA] transition-colors disabled:opacity-50"
-            >
-              /{cmd.toLowerCase()}
-            </button>
-          ))}
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(input);
-          }}
-          className="flex items-center gap-2 bg-[#0F1C16] rounded-xl px-3 py-2 border border-[#D8C3A5]/20 focus-within:border-[#C88A5E]/50 transition-colors"
-        >
-          <span className="text-[#C88A5E] font-mono">~$</span>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
-            disabled={typing}
-            className="flex-1 bg-transparent border-none outline-none text-[#F5F1EA] font-mono text-sm placeholder:text-[#A8BFA0]/50"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || typing}
-            className="p-1.5 rounded-lg text-[#A8BFA0] hover:text-[#C88A5E] hover:bg-[#C88A5E]/10 transition-colors disabled:opacity-50"
-          >
-            <Send size={16} />
-          </button>
-        </form>
-      </div>
+      <div className="border-t border-[#617A55]/45 bg-[#1E3A2F] p-3 sm:p-4"><div className="mb-3 flex flex-wrap gap-2">{QUICK_COMMANDS.map((command) => <button key={command} onClick={() => send(command)} disabled={typing} className="rounded-lg border border-[#617A55]/45 bg-[#617A55]/15 px-2.5 py-1.5 text-[10px] text-[#B8C9B2] transition-colors hover:border-[#D8C3A5]/50 hover:bg-[#D8C3A5]/10 hover:text-[#F5F1EA] disabled:opacity-50" style={{ fontFamily: soria }}>/{command.toLowerCase()}</button>)}</div><form onSubmit={(event) => { event.preventDefault(); send(input); }} className="flex items-center gap-2 rounded-xl border border-[#617A55]/50 bg-[#132821] px-3 py-2.5 focus-within:border-[#D8C3A5]/60"><span className="font-mono text-[#D8C3A5]">~$</span><input type="text" value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about my work..." disabled={typing} className="min-w-0 flex-1 bg-transparent font-mono text-sm text-[#F5F1EA] outline-none placeholder:text-[#B8C9B2]/50" /><button type="submit" disabled={!input.trim() || typing} aria-label="Send message" className="rounded-lg p-1.5 text-[#B8C9B2] transition-colors hover:bg-[#D8C3A5]/10 hover:text-[#D8C3A5] disabled:opacity-50"><Send size={16} /></button></form></div>
     </div>
   );
 }
 
-/* ---------------------------------------------------------------------- */
-/*  About section                                                          */
-/* ---------------------------------------------------------------------- */
-
 const stats = [
   { value: "10+", label: "Full Stack Projects", icon: Code },
-  { value: "8+", label: "Certifications", icon: Award },
-  { value: "2+", label: "Hackathon Wins", icon: Target },
-  { value: "100%", label: "Clean Code Focus", icon: CheckCircle2 },
+  { value: "8+", label: "Professional Certifications", icon: Award },
+  { value: "2+", label: "Hackathon Wins & Demos", icon: Target },
+  { value: "100%", label: "Clean Code & Quality Focus", icon: CheckCircle2 },
 ];
+
+const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const } } };
 
 export default function About() {
   return (
-    <section
-      id="about"
-      className="relative overflow-hidden bg-[#1E3A2F] px-6 py-25 md:px-10 lg:px-16"
-    >
-      {/* Ambient glows */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_left,rgba(96,122,85,0.1),transparent_60%)]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(200,138,94,0.06),transparent_55%)]" />
-
+    <section id="about" className="relative overflow-hidden bg-[#1E3A2F] px-4 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6 }}
-          className="mb-14 text-center lg:text-left"
-        >
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-[#D8C3A5]"
-            style={{ fontFamily: soria }}
-          >
-            About Me
-          </p>
-          <h2
-            className="mt-2 text-3xl font-bold tracking-tight text-[#F5F1EA] sm:text-4xl md:text-5xl"
-            style={{ fontFamily: soria }}
-          >
-            Ask, don't just read.
-          </h2>
+        <motion.header initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.6 }} className="mb-10 flex flex-col gap-4 sm:mb-14 lg:flex-row lg:items-end lg:justify-between" style={{ fontFamily: soria }}>
+          <div><p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#D8C3A5]">About me</p><h2 className="mt-3 max-w-3xl text-4xl font-bold leading-[0.98] tracking-[-0.04em] text-[#F5F1EA] sm:text-5xl md:text-6xl">The person behind<br /><span className="text-[#D8C3A5]">the products.</span></h2></div>
+          <p className="max-w-sm text-sm leading-6 text-[#B8C9B2] lg:text-right">A clearer look at how I think, build, and keep learning.</p>
+        </motion.header>
+
+        {/* Angled introduction panel */}
+        <motion.div variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="relative mb-8 overflow-hidden rounded-[1.75rem] border border-[#617A55]/45 bg-[#617A55]/15">
+          <div className="grid min-h-[330px] lg:grid-cols-[1.35fr_0.65fr]">
+            <div className="relative z-10 flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+              <div className="flex items-center gap-3 text-[#D8C3A5]"><Sparkles size={17} /><span className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ fontFamily: soria }}>Quick introduction</span></div>
+              <p className="mt-7 max-w-3xl text-2xl font-medium leading-[1.25] text-[#F5F1EA] sm:text-3xl lg:text-4xl" style={{ fontFamily: soria }}><strong className="text-[#D8C3A5]">Premkumar Patil</strong> is a Full Stack Developer and AI Engineer who builds complete products, not just screens.</p>
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-[#B8C9B2] sm:text-base" style={{ fontFamily: soria }}>I move between product thinking, interface design, backend architecture, and the details that make software feel dependable.</p>
+              <a href="#projects" className="mt-7 inline-flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#D8C3A5] transition-colors hover:text-[#F5F1EA]" style={{ fontFamily: soria }}>Explore my work <ArrowUpRight size={15} /></a>
+            </div>
+            <div className="relative min-h-[180px] overflow-hidden bg-[#1E3A2F] lg:min-h-0 lg:[clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)]"><div className="absolute inset-0 flex items-center justify-center p-8 lg:pl-16"><div className="text-center" style={{ fontFamily: soria }}><p className="text-6xl font-bold text-[#D8C3A5]">01</p><p className="mt-2 text-xs uppercase tracking-[0.22em] text-[#B8C9B2]">Mindset / craft / growth</p></div></div></div>
+          </div>
         </motion.div>
 
-        <div className="grid gap-10 lg:grid-cols-12 items-start">
-          {/* Left: condensed intro + floating stats */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-5 flex flex-col gap-8"
-          >
-            <div className="flex items-center gap-2 text-[#D8C3A5]">
-              <Sparkles size={16} />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ fontFamily: soria }}>
-                Quick intro
-              </span>
-            </div>
-
-            <p
-              className="text-xl font-medium leading-relaxed text-[#F5F1EA] sm:text-2xl"
-              style={{ fontFamily: soria }}
-            >
-              <strong className="text-[#D8C3A5]">Premkumar Patil</strong> — Full Stack
-              Developer & AI Engineer. I build complete products, not just
-              screens.
-            </p>
-
-            <p className="text-sm leading-6 text-[#B8C9B2]" style={{ fontFamily: soria }}>
-              The chatbot on the right knows more than this paragraph does —
-              try it.
-            </p>
-
-            {/* Floating stat badges — scattered, alive */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              {stats.map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
-                    animate={{ y: [0, i % 2 === 0 ? -5 : 5, 0] }}
-                    style={{
-                      transform: `rotate(${i % 2 === 0 ? -1.5 : 1.5}deg)`,
-                    }}
-                    whileHover={{ y: -4, rotate: 0, transition: { duration: 0.2 } }}
-                    className="rounded-2xl p-4"
-                  >
-                    <div
-                      className="rounded-2xl p-4"
-                      style={{
-                        background: "linear-gradient(155deg, rgba(97,122,85,0.14) 0%, rgba(19,40,33,0.4) 100%)",
-                        border: "1px solid rgba(216,195,165,0.16)",
-                        boxShadow: "0 12px 28px rgba(10,21,18,0.35)",
-                      }}
-                    >
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D8C3A5]/10 text-[#D8C3A5] mb-3">
-                        <Icon size={15} />
-                      </div>
-                      <h3 className="text-xl font-extrabold text-[#F5F1EA] font-mono tracking-tight">
-                        {stat.value}
-                      </h3>
-                      <p className="mt-1 text-[10px] font-medium leading-relaxed text-[#A8BFA0]">
-                        {stat.label}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-
-          {/* Right: chatbot */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-7"
-          >
-            <AskPremTerminal />
-          </motion.div>
+        {/* Information grid in the former chatbot area */}
+        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => { const Icon = stat.icon; return <motion.div key={stat.label} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.08, duration: 0.5 }} whileHover={{ y: -5 }} className="flex min-h-[170px] flex-col justify-between rounded-2xl border border-[#617A55]/45 bg-[#1E3A2F] p-5" style={{ fontFamily: soria }}><div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#D8C3A5]/20 bg-[#D8C3A5]/10 text-[#D8C3A5]"><Icon size={19} /></div><div><p className="text-3xl font-bold text-[#F5F1EA]">{stat.value}</p><p className="mt-2 text-[11px] leading-5 text-[#B8C9B2]">{stat.label}</p></div></motion.div>; })}
         </div>
+
+        {/* <div className="mb-10 grid gap-4 md:grid-cols-3" style={{ fontFamily: soria }}>
+          <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border border-[#617A55]/45 bg-[#617A55]/15 p-6 md:col-span-2"><div className="flex items-center gap-3 text-[#D8C3A5]"><Lightbulb size={19} /><h3 className="text-sm font-semibold text-[#F5F1EA]">Engineering mindset</h3></div><p className="mt-4 max-w-2xl text-sm leading-7 text-[#B8C9B2]">My journey began with C and Java, then expanded into React, Next.js, Python, FastAPI, and modern databases. I prioritize maintainable architecture, testing, type safety, and thoughtful interfaces over quick hacks.</p></motion.div>
+          <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border border-[#617A55]/45 bg-[#1E3A2F] p-6"><div className="flex items-center gap-3 text-[#D8C3A5]"><Compass size={19} /><h3 className="text-sm font-semibold text-[#F5F1EA]">What&apos;s next</h3></div><p className="mt-4 text-sm leading-7 text-[#B8C9B2]">AI-assisted applications, scalable full-stack systems, and real-time products.</p></motion.div>
+        </div> */}
+
+        {/* Chatbot moved below the grid */}
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7 }}>
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between" style={{ fontFamily: soria }}><div><p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#D8C3A5]">Interactive profile</p><h3 className="mt-2 text-2xl font-bold text-[#F5F1EA] sm:text-3xl">Ask me anything.</h3></div><p className="text-sm text-[#B8C9B2] sm:text-right">Use a quick command or type your own question.</p></div>
+          <AskPremTerminal />
+        </motion.div>
       </div>
     </section>
   );
 }
+
+/* Palette: 60% Forest Green #1E3A2F, 30% Moss Green #617A55, 10% Champagne Gold #D8C3A5. */
+      

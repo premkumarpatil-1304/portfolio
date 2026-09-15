@@ -27,10 +27,10 @@ const hackathons = [
     location: "MIT Alandi",
     description:
       "Developed a scalable full-stack software application using React, FastAPI and MongoDB with reusable components, REST APIs and role-based authentication. Designed an intuitive user interface with real-time status tracking, location mapping, community engagement and role-based access for citizens and officials.",
-    award: "Participant",
+    award: "Top 10 among 200 participants",
     team: "Solo",
     duration: "48 Hours",
-    tech: ["React", "Node.js", "MongoDB"],
+    tech: ["React", "FastAPI", "MongoDB"],
   },
   {
     title: "Tatva Hackathon",
@@ -38,9 +38,9 @@ const hackathons = [
     description:
       "Built an AI-enabled personal finance platform using React, FastAPI and MongoDB with secure JWT authentication. Integrated AI-powered spending analysis and budgeting assistance to deliver personalized financial recommendations. Developed REST APIs and response dashboards while ensuring scalable backend architecture.",
     award: "Participant",
-    team: "3 Members",
+    team: "5 Members",
     duration: "36 Hours",
-    tech: ["Next.js", "FastAPI", "PostgreSQL"],
+    tech: ["Next.js", "FastAPI", "MongoDB"],
   },
   {
     title: "Smart India Hackathon",
@@ -48,7 +48,7 @@ const hackathons = [
     description:
       "Built a civic problem reporting platform with real-time tracking, maps integration, and role-based authentication.",
     award: "Participation Certificate",
-    team: "4 Members",
+    team: "6 Members",
     duration: "72 Hours",
     tech: ["React", "Python", "AWS"],
   },
@@ -647,7 +647,7 @@ export default function Achievements() {
         <div>
           <h3 className="text-xl font-bold text-[#F5F1EA] flex items-center gap-2 mb-1" style={{ fontFamily: soria }}>
             <Award className="text-[#D8C3A5]" size={22} />
-            <span>Verified Certifications</span>
+            <span>Certifications</span>
           </h3>
 
           <CertificationsFiltered certifications={certifications} />

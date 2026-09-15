@@ -17,7 +17,7 @@ const SYSTEM_PROMPT = `You are a chatbot embedded in Premkumar Patil's portfolio
 - Other: Git, CI/CD pipelines, AWS, Redis, agile workflows, code review
 
 === WORK EXPERIENCE ===
-Technical Intern — Alltius Pvt Ltd (2024 – Present, Remote / On-site)
+Technical Intern — Alltius Pvt Ltd (Jan 2026 – Feb 2026, Remote / On-site)
 - Works closely with core engineering teams to architect scalable REST APIs, build modern React interfaces, and implement real-time communication modules.
 - Engineered backend RESTful microservices using Python FastAPI, reducing API latency and improving query throughput.
 - Collaborated on frontend feature development with React and TypeScript, delivering pixel-perfect responsive layouts.

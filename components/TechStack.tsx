@@ -729,28 +729,10 @@ const Hexagon = memo(function Hexagon({
           ease: [0.16, 1, 0.3, 1],
         }}
       >
-        <defs>
-          <linearGradient
-            id={`border-grad-${skill.name}`}
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
-          >
-            <stop
-              offset="0%"
-              stopColor={isActive ? brand.primary : `${brand.primary}50`}
-            />
-            <stop
-              offset="100%"
-              stopColor={isActive ? `${brand.primary}aa` : `${brand.primary}20`}
-            />
-          </linearGradient>
-        </defs>
         <polygon
           points="50,2 96,27 96,88 50,113 4,88 4,27"
           fill={brand.bg}
-          stroke={`url(#border-grad-${skill.name})`}
+          stroke={isActive ? brand.primary : `${brand.primary}55`}
           strokeWidth={isActive ? 2 : 1}
           style={{
             filter: isActive
@@ -766,9 +748,7 @@ const Hexagon = memo(function Hexagon({
         className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer outline-none z-10"
         style={{
           clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-          background: isActive
-            ? `radial-gradient(ellipse at center, ${brand.glow}, transparent 70%)`
-            : "transparent",
+          background: isActive ? brand.bg : "transparent",
           transition: "background 0.25s ease",
         }}
         whileHover={
@@ -796,18 +776,7 @@ const Hexagon = memo(function Hexagon({
         role="button"
       >
         <motion.div
-          animate={
-            reducedMotion
-              ? {}
-              : {
-                y: [0, -3, 0],
-                transition: {
-                  duration: 3 + (index % 5) * 0.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                },
-              }
-          }
+          animate={{}}
           className="flex flex-col items-center gap-1"
         >
           <motion.div
@@ -911,7 +880,7 @@ function DetailPanel({ skill, onClose, reducedMotion }: DetailPanelProps) {
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className="relative w-full max-w-lg rounded-2xl overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(30,58,47,0.95) 0%, rgba(13,26,21,0.98) 100%)",
+          backgroundColor: "#1E3A2F",
           border: `1px solid ${brand.border}`,
           boxShadow: `0 0 40px ${brand.glow}, 0 24px 80px rgba(0,0,0,0.5)`,
         }}
@@ -1035,7 +1004,7 @@ function DetailPanel({ skill, onClose, reducedMotion }: DetailPanelProps) {
                 transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 className="h-full rounded-full"
                 style={{
-                  background: `linear-gradient(90deg, ${brand.primary}, ${brand.text})`,
+                  background: brand.primary,
                   boxShadow: `0 0 8px ${brand.glow}`,
                 }}
               />
@@ -1117,71 +1086,11 @@ function DetailPanel({ skill, onClose, reducedMotion }: DetailPanelProps) {
 
 function AnimatedBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Animated gradient — recolored */}
-      <motion.div
-        animate={{
-          background: [
-            "radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.06), transparent 50%)",
-            "radial-gradient(ellipse at 80% 20%, rgba(97,122,85,0.05), transparent 50%)",
-            "radial-gradient(ellipse at 50% 80%, rgba(216,195,165,0.04), transparent 50%)",
-            "radial-gradient(ellipse at 20% 50%, rgba(216,195,165,0.06), transparent 50%)",
-          ],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0"
-      />
-
-      {/* Soft mesh — recolored */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(216,195,165,0.02) 0%, transparent 30%, rgba(97,122,85,0.02) 50%, transparent 70%, rgba(184,201,178,0.02) 100%)",
-        }}
-      />
-
-      {/* Floating blurred circles — recolored */}
-      <motion.div
-        className="absolute top-[15%] left-[10%] w-64 h-64 rounded-full blur-[100px]"
-        style={{ background: "rgba(216,195,165,0.05)" }}
-        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[60%] right-[15%] w-80 h-80 rounded-full blur-[120px]"
-        style={{ background: "rgba(97,122,85,0.04)" }}
-        animate={{ x: [0, -25, 0], y: [0, 15, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[10%] left-[30%] w-56 h-56 rounded-full blur-[90px]"
-        style={{ background: "rgba(184,201,178,0.03)" }}
-        animate={{ x: [0, 20, 0], y: [0, -10, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Subtle grid — recolored */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(184,201,178,0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(184,201,178,0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      {/* Noise texture */}
-      <div
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-          backgroundSize: "128px 128px",
-        }}
-      />
-    </div>
+    <div
+      className="pointer-events-none absolute inset-0"
+      aria-hidden="true"
+      style={{ backgroundColor: "#1E3A2F" }}
+    />
   );
 }
 
@@ -1376,7 +1285,7 @@ export default function HoneycombSkills() {
       ref={sectionRef}
       className="relative overflow-hidden py-24 md:py-32"
       style={{
-        background: "linear-gradient(180deg, #0d1a15 0%, #1E3A2F 50%, #0d1a15 100%)",
+        backgroundColor: "#1E3A2F",
       }}
     >
       <AnimatedBackground />
@@ -1394,9 +1303,7 @@ export default function HoneycombSkills() {
             className="text-[11px] font-semibold uppercase tracking-[0.35em]"
             style={{
               fontFamily: "'Soria', 'Century Gothic', sans-serif",
-              background: "linear-gradient(90deg, #D8C3A5, #B8C9B2, #617A55)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              color: "#D8C3A5",
             }}
           >
             Technical Expertise
@@ -1503,7 +1410,7 @@ export default function HoneycombSkills() {
                             height: 40,
                             marginLeft: -20,
                             marginTop: -20,
-                            background: `radial-gradient(circle, ${ripple.brand.glow}, transparent 70%)`,
+                            background: ripple.brand.bg,
                           }}
                         />
                       ))}
@@ -1597,10 +1504,7 @@ export default function HoneycombSkills() {
                   className="text-2xl md:text-3xl font-bold"
                   style={{
                     fontFamily: "'Soria', 'Century Gothic', sans-serif",
-                    background:
-                      "linear-gradient(135deg, #D8C3A5, #B8C9B2)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    color: "#D8C3A5",
                   }}
                 >
                   {stat.value}

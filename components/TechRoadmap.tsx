@@ -21,7 +21,7 @@ const branches = [
   {
     name: "Foundation",
     icon: Code2,
-    skills: ["C", "Java", "DSA"],
+    skills: ["Python", "Java", "DSA"],
     color: "#617A55",
   },
   {
@@ -68,6 +68,15 @@ function GrowingBranch({
   const ref = useRef<HTMLDivElement>(null);
   const Icon = branch.icon;
 
+
+
+
+  
+ //TECH JOURNEY CODE
+
+
+
+
   return (
     <motion.div
       ref={ref}
@@ -77,6 +86,7 @@ function GrowingBranch({
       transition={{ duration: 0.5 }}
       className="relative flex flex-col items-center"
     >
+      
       {/* Branch connecting line — grows from top */}
       <motion.div
         initial={{ height: 0 }}
